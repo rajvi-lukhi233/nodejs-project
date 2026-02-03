@@ -1,16 +1,43 @@
 const mongoose = require("mongoose");
-const { DB_NAME } = require("../utils/constant");
-const orderSchema = mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: DB_NAME.USER,
-    required: true,
-  },
-  product: [
-    {
-      // productId:
+const { DB_NAME, STATUS } = require("../utils/constant");
+const orderSchema = mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: DB_NAME.USER,
+      required: true,
     },
-  ],
-});
+    products: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: DB_NAME.PRODUCT,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
+    shippingAddress: {
+      city: { type: String, default: null },
+      state: { type: String, default: null },
+      country: { type: String, default: null },
+      zipCode: { type: String, default: null },
+      address: { type: String, default: null },
+    },
+    totalAmount: {
+      type: Number,
+      default: 0,
+    },
+    orderStatus: {
+      type: String,
+      enum: Object.values(STATUS),
+      default: STATUS.PENDING,
+    },
+  },
+  { timestamps: true, versionKey: false },
+);
 
 exports.orderModel = mongoose.model(DB_NAME.ORDER, orderSchema);

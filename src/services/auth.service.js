@@ -12,6 +12,6 @@ exports.updateUserById = (id, data) => {
 exports.deleteUser = (id) => {
   return userModel.findByIdAndDelete(id);
 };
-exports.findById = (id, option) => {
+exports.findUserById = (id, option) => {
   return userModel.findById(id, option);
 };

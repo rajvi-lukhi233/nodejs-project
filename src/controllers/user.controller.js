@@ -2,14 +2,14 @@ const {
   findOne,
   updateUserById,
   deleteUser,
-  findById,
+  findUserById,
 } = require("../services/auth.service");
 const { errorResponse, successResponse } = require("../utils/resUtil");
 
 exports.getUserProfile = async (req, res) => {
   try {
     const { userId } = req.user;
-    const user = await findById(userId);
+    const user = await findUserById(userId);
     if (!user) {
       return errorResponse(res, 404, "This user is not found");
     }
@@ -53,7 +53,7 @@ exports.updateUserProfile = async (req, res) => {
 exports.deleteUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await findById(userId, { id: 1 });
+    const user = await findUserById(userId, { id: 1 });
     if (!user) {
       return errorResponse(res, 404, "This user is not found");
     }
