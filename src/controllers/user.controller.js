@@ -4,6 +4,7 @@ const {
   deleteUser,
   findUserById,
 } = require("../services/auth.service");
+const { logger } = require("../utils/logger");
 const { errorResponse, successResponse } = require("../utils/resUtil");
 
 exports.getUserProfile = async (req, res) => {
@@ -15,13 +16,14 @@ exports.getUserProfile = async (req, res) => {
     }
     return successResponse(res, 200, "User profile retrive successfully", user);
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`getUserProfile API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };
 
 exports.updateUserProfile = async (req, res) => {
   try {
+    logger.info("User updated.");
     const { userId } = req.params;
     const { name, email } = req.body;
     if (email) {
@@ -45,13 +47,14 @@ exports.updateUserProfile = async (req, res) => {
     }
     return errorResponse(res, 400, "User profile not updated");
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`updateUserProfile API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };
 
 exports.deleteUserProfile = async (req, res) => {
   try {
+    logger.info("User deleted.");
     const { userId } = req.params;
     const user = await findUserById(userId, { id: 1 });
     if (!user) {
@@ -60,7 +63,7 @@ exports.deleteUserProfile = async (req, res) => {
     await deleteUser(userId);
     return successResponse(res, 200, "User deleted successfully.");
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`deleteUserProfile API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };

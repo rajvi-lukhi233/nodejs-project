@@ -7,14 +7,14 @@ const { successResponse, errorResponse } = require("../utils/resUtil");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const { ROLE } = require("../utils/constant");
+const { logger } = require("../utils/logger");
 
 exports.register = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
     const existUser = await findOne({ email }, { id: 1 });
     if (existUser) {
-      return successResponse(
+      return errorResponse(
         res,
         400,
         "User already registered with this email.Please use other email.",
@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
     }
     return errorResponse(res, 400, "User not registered");
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`Register API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };
@@ -71,10 +71,10 @@ exports.login = async (req, res) => {
       role: user.role,
       token,
     };
-
+    logger.info("User login.");
     return successResponse(res, 200, "User login successfully.", userResponse);
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`Login API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };
@@ -98,7 +98,7 @@ exports.sendOtp = async (req, res) => {
       { otp },
     );
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`Send OTP API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };
@@ -131,7 +131,7 @@ exports.verifyOtp = async (req, res) => {
       token: resetPassToken,
     });
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`Verify OTP API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };
@@ -155,7 +155,7 @@ exports.forgotPassword = async (req, res) => {
 
     return successResponse(res, 200, "Password reset successfully.");
   } catch (error) {
-    console.log("Somthing want wrong please try again", error);
+    logger.error(`Forgot password API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };

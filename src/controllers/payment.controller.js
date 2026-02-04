@@ -8,6 +8,7 @@ const {
   paymentList,
 } = require("../services/payment.service");
 const { errorResponse, successResponse } = require("../utils/resUtil");
+const { logger } = require("../utils/logger");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.getPaymentList = async (req, res) => {
@@ -23,7 +24,7 @@ exports.getPaymentList = async (req, res) => {
       payment,
     );
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`PaymentList API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };
@@ -66,7 +67,7 @@ exports.createCheckoutPayment = async (req, res) => {
       paymentUrl: checkout.url,
     });
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`Create payment API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };
@@ -116,8 +117,7 @@ exports.webhook = async (req, res) => {
         { orderId: orderId },
         { paymentStatus: STATUS.COMPLETED },
       );
-      console.log(`Payment for order ${orderId} completed`);
-
+      logger.info("Payment completed.");
       return successResponse(res, 200, "Payment success.");
     }
     if (event.type == "checkout.session.async_payment_failed") {
@@ -128,11 +128,11 @@ exports.webhook = async (req, res) => {
         { orderId: orderId },
         { paymentStatus: STATUS.FAILED },
       );
-      console.log(`Payment failed for order ${orderId}`);
+      logger.error("Payment failed.");
       return errorResponse(res, 400, "Payment faild");
     }
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`Webhook Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };

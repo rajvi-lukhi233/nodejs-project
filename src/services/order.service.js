@@ -1,12 +1,21 @@
+const { default: mongoose } = require("mongoose");
 const { orderModel } = require("../models/orders.model");
-const { DB_NAME } = require("../utils/constant");
+const { DB_NAME, ROLE } = require("../utils/constant");
 
 exports.create = (data) => {
   return orderModel.create(data);
 };
 
-exports.findAllOrders = () => {
-  return orderModel.aggregate([
+exports.findAllOrders = (userId, role) => {
+  const pipeline = [];
+  if (role == ROLE.USER) {
+    pipeline.push({
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+      },
+    });
+  }
+  pipeline.push(
     {
       $lookup: {
         from: DB_NAME.USER,
@@ -40,8 +49,8 @@ exports.findAllOrders = () => {
         ],
       },
     },
-   {
-      $addFields: { 
+    {
+      $addFields: {
         userName: { $arrayElemAt: ["$userDetails.name", 0] },
         productDetails: {
           $map: {
@@ -72,8 +81,10 @@ exports.findAllOrders = () => {
         totalAmount: 1,
       },
     },
-  ]);
+  );
+  return orderModel.aggregate(pipeline);
 };
+
 exports.findOrderById = (id, option) => {
   return orderModel
     .findById(id, option)
@@ -86,4 +97,33 @@ exports.updateById = (id, data) => {
 
 exports.deleteById = (id) => {
   return orderModel.findByIdAndDelete(id);
+};
+
+exports.findOrderByUser = () => {
+  return orderModel.aggregate([
+    {
+      $group: {
+        _id: "$userId",
+        totalOrders: { $sum: 1 },
+        orders: { $push: "$$ROOT" },
+      },
+    },
+    {
+      $lookup: {
+        from: DB_NAME.USER,
+        localField: "_id",
+        foreignField: "_id",
+        as: "userDetails",
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        userId: "$_id",
+        userName: { $arrayElemAt: ["$userDetails.name", 0] },
+        totalOrders: 1,
+        orders: 1,
+      },
+    },
+  ]);
 };

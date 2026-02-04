@@ -13,7 +13,7 @@ exports.validation = (schema) => {
       }
       next();
     } catch (error) {
-      console.log("Validation middleware failed", error);
+      logger.error(`Validation Error:${error.message}`);
       return errorResponse(res, 500, "Internal server error during validation");
     }
   };

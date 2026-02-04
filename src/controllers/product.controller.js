@@ -8,9 +8,11 @@ const {
   findProductById,
 } = require("../services/product.service");
 const { successResponse, errorResponse } = require("../utils/resUtil");
+const { logger } = require("../utils/logger");
 
 exports.getAllProducts = async (req, res) => {
   try {
+    logger.info("Products fatched.");
     const products = await findAll();
     if (!products) {
       return errorResponse(res, 404, "Products not found.");
@@ -22,15 +24,16 @@ exports.getAllProducts = async (req, res) => {
       products,
     );
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`ProductList API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };
 
 exports.addProduct = async (req, res) => {
   try {
+    logger.info("Product added.");
     const { name, price, stock, description, category } = req.body;
-    const image = req.file.filename;
+    const image = req.file?.filename;
     const product = await createProduct({
       name,
       image,
@@ -44,13 +47,14 @@ exports.addProduct = async (req, res) => {
     }
     return errorResponse(res, 400, "Product not added.");
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`AddProduct API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };
 
 exports.updateProduct = async (req, res) => {
   try {
+    logger.info("Product updated.");
     const { productId } = req.params;
     const { name, price, stock, description, category } = req.body;
     const newImage = req.file?.filename;
@@ -81,13 +85,14 @@ exports.updateProduct = async (req, res) => {
       updatedProduct,
     );
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`UpdateProduct API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };
 
 exports.deleteProduct = async (req, res) => {
   try {
+    logger.info("Product deleted.");
     const { productId } = req.params;
     const product = await findProductById(productId, { id: 1 });
     if (!product) {
@@ -96,7 +101,7 @@ exports.deleteProduct = async (req, res) => {
     await deleteById(productId);
     return successResponse(res, 200, "Product deleted successfully.");
   } catch (error) {
-    console.log("Somthing want wrong please try again.", error);
+    logger.error(`DeleteProduct API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error.");
   }
 };

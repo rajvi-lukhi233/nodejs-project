@@ -8,6 +8,7 @@ const {
   webhook,
   createCheckoutPayment,
   createPaymentIntent,
+  getUserWiseOrder,
 } = require("../controllers/order.controller");
 const { validation } = require("../middleware/validationMiddleware");
 const {
@@ -20,6 +21,7 @@ const route = express.Router();
 
 route
   .get("/", auth, getAllOrders)
+  .get("/getUserWiseOrder", auth, authRole(ROLE.ADMIN), getUserWiseOrder)
   .post("/", auth, validation(createOrderSchemaValidation), craeteOrder)
   .put("/:orderId", auth, validation(updateOrderSchemaValidation), updateOrder)
   .delete(

@@ -25,4 +25,6 @@ const paymentSchema = mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
+paymentSchema.index({ userId: 1, paymentStatus: 1 });
+
 exports.paymentModel = mongoose.model(DB_NAME.PAYMENT, paymentSchema);

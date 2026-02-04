@@ -31,7 +31,7 @@ exports.authRole = (roles = []) => {
       }
       next();
     } catch (error) {
-      console.log("Internal server error", error);
+      logger.error(`Unauthorized Error:${error.message}`);
       return errorResponse(res, 500, "Internal server error.");
     }
   };

@@ -39,5 +39,6 @@ const orderSchema = mongoose.Schema(
   },
   { timestamps: true, versionKey: false },
 );
+orderSchema.index({ orderStatus: 1, userId: 1 });
 
 exports.orderModel = mongoose.model(DB_NAME.ORDER, orderSchema);
