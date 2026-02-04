@@ -10,7 +10,7 @@ const { errorResponse, successResponse } = require("../utils/resUtil");
 exports.getUserProfile = async (req, res) => {
   try {
     const { userId } = req.user;
-    const user = await findUserById(userId);
+    const user = await findOne({ _id: userId });
     if (!user) {
       return errorResponse(res, 404, "This user is not found");
     }
@@ -60,7 +60,7 @@ exports.deleteUserProfile = async (req, res) => {
     if (!user) {
       return errorResponse(res, 404, "This user is not found");
     }
-    await deleteUser(userId);
+    await updateUserById(userId, { deletedAt: Date.now() });
     return successResponse(res, 200, "User deleted successfully.");
   } catch (error) {
     logger.error(`deleteUserProfile API Error:${error.message}`);

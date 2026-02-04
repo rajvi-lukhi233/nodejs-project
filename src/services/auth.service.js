@@ -1,7 +1,7 @@
 const { userModel } = require("../models/users.model");
 
 exports.findOne = (filter, option) => {
-  return userModel.findOne(filter, option);
+  return userModel.findOne({ deletedAt: null, ...filter }, option);
 };
 exports.createUser = (data) => {
   return userModel.create(data);

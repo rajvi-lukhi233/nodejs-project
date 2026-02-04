@@ -1,4 +1,4 @@
-const { findUserById } = require("../services/auth.service");
+const { findOne } = require("../services/auth.service");
 const { errorResponse } = require("../utils/resUtil");
 const jwt = require("jsonwebtoken");
 exports.auth = async (req, res, next) => {
@@ -8,7 +8,7 @@ exports.auth = async (req, res, next) => {
   }
   try {
     let decoded = jwt.verify(token, process.env.JWT_KEY);
-    const user = await findUserById(decoded.userId);
+    const user = await findOne({ _id: decoded.userId });
     if (!user) {
       return errorResponse(res, 404, "This user is not found");
     }

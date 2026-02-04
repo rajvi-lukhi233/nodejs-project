@@ -51,7 +51,9 @@ exports.findAllOrders = (userId, role) => {
     },
     {
       $addFields: {
-        userName: { $arrayElemAt: ["$userDetails.name", 0] },
+        userName: {
+          $ifNull: [{ $arrayElemAt: ["$userDetails.name", 0] }, null],
+        },
         productDetails: {
           $map: {
             input: "$productDetails",
