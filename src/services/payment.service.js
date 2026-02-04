@@ -1,4 +1,3 @@
-const { pipeline } = require("nodemailer/lib/xoauth2");
 const { paymentModel } = require("../models/payments.model");
 const { DB_NAME } = require("../utils/constant");
 
