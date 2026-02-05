@@ -13,7 +13,8 @@ const { logger } = require("../utils/logger");
 exports.getAllProducts = async (req, res) => {
   try {
     logger.info("Products fatched.");
-    const products = await findAll();
+    const { limit, page } = req.query;
+    const products = await findAll({}, limit, page);
     if (!products) {
       return errorResponse(res, 404, "Products not found.");
     }

@@ -15,12 +15,14 @@ const route = express.Router();
 route
   .get("/", auth, getUserProfile)
   .put(
-    "/updateUserById/:userId",
+    "/updateUser/:userId",
+    auth,
     validation(updateUserSchemaValidation),
     updateUserProfile,
   )
   .delete(
     "/deleteUser/:userId",
+    auth,
     validation(deleteUserSchemaValidation),
     deleteUserProfile,
   );
