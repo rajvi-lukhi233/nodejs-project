@@ -37,6 +37,14 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerifyToken: {
+      type: String,
+      default: null,
+    },
     deletedAt: {
       type: Date,
       default: null,

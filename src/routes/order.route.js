@@ -5,9 +5,6 @@ const {
   getAllOrders,
   updateOrder,
   deleteOrder,
-  webhook,
-  createCheckoutPayment,
-  createPaymentIntent,
   getUserWiseOrder,
 } = require("../controllers/order.controller");
 const { validation } = require("../middleware/validationMiddleware");

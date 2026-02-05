@@ -8,6 +8,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { logger } = require("../utils/logger");
+const { sendMail } = require("../utils/sendMail");
+const {
+  getVerifyEmailTemplate,
+  getOtpEmailTemplate,
+} = require("../utils/emailBody");
 
 exports.register = async (req, res) => {
   try {
@@ -20,13 +25,16 @@ exports.register = async (req, res) => {
         "User already registered with this email.Please use other email.",
       );
     }
+    const verifyToken = crypto.randomBytes(32).toString("hex");
     const bcryptedPass = await bcrypt.hash(password, 10);
     const user = await createUser({
       name,
       email,
       password: bcryptedPass,
       role,
+      emailVerifyToken: verifyToken,
     });
+
     let token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_KEY,
@@ -36,7 +44,15 @@ exports.register = async (req, res) => {
     );
     user._doc.token = token;
     if (user) {
-      return successResponse(res, 200, "User registered successfully.", user);
+      const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
+      const emailBody = getVerifyEmailTemplate(name, verifyLink);
+      sendMail(email, "Verify Your Email", emailBody);
+      return successResponse(
+        res,
+        200,
+        "User registered successfully.Please go to your email and verify your account",
+        user,
+      );
     }
     return errorResponse(res, 400, "User not registered");
   } catch (error) {
@@ -45,12 +61,34 @@ exports.register = async (req, res) => {
   }
 };
 
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await findOne({ emailVerifyToken: token }, { id: 1 });
+    if (!user) {
+      return errorResponse(res, 400, "Invalid emailverification token.");
+    }
+    await updateUserById(user._id, {
+      isVerified: true,
+      emailVerifyToken: null,
+    });
+    return successResponse(res, 200, "Email verified successfully");
+  } catch (error) {
+    logger.error(`VerifyEmailAPI Error:${error.message}`);
+    return errorResponse(res, 500, "Internal server error");
+  }
+};
+
 exports.login = async (req, res) => {
   try {
     let { email, password } = req.body;
     let user = await findOne({ email });
+
     if (!user) {
       return errorResponse(res, 404, "User is not registered with this email.");
+    }
+    if (!user.isVerified) {
+      return errorResponse(res, 400, "Please verify your email.");
     }
     const comparePass = await bcrypt.compare(password, user.password);
     if (!comparePass) {
@@ -91,6 +129,8 @@ exports.sendOtp = async (req, res) => {
       otpCode: otp,
       otpExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
     });
+    const emailBody = getOtpEmailTemplate(user.name, otp);
+    sendMail(email, "Forgot password OPT", emailBody);
     return successResponse(
       res,
       200,

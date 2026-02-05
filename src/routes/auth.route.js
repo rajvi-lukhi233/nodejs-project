@@ -5,6 +5,7 @@ const {
   forgotPassword,
   sendOtp,
   verifyOtp,
+  verifyEmail,
 } = require("../controllers/auth.controller");
 const { validation } = require("../middleware/validationMiddleware");
 const {
@@ -25,6 +26,7 @@ route
     "/forgotPassword",
     validation(forgotPasswordSchemaValidation),
     forgotPassword,
-  );
+  )
+  .get("/verifyEmail/:token", verifyEmail);
 
 module.exports = route;
