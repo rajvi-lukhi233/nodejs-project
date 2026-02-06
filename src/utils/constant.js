@@ -3,6 +3,7 @@ exports.DB_NAME = {
   ORDER: "orders",
   PRODUCT: "products",
   PAYMENT: "payments",
+  MESSAGE: "messages",
 };
 exports.ROLE = {
   ADMIN: "admin",

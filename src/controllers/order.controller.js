@@ -15,9 +15,6 @@ exports.getAllOrders = async (req, res) => {
     logger.info("Orderes fatched.");
     const { userId, role } = req.user;
     const orders = await findAllOrders(userId, role);
-    if (!orders) {
-      return errorResponse(res, 404, "Orders not found.");
-    }
     return successResponse(
       res,
       200,

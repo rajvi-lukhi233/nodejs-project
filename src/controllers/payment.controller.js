@@ -9,6 +9,7 @@ const {
 } = require("../services/payment.service");
 const { errorResponse, successResponse } = require("../utils/resUtil");
 const { logger } = require("../utils/logger");
+const { findOne, updateUserById } = require("../services/auth.service");
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.getPaymentList = async (req, res) => {

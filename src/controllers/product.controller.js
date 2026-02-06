@@ -15,9 +15,6 @@ exports.getAllProducts = async (req, res) => {
     logger.info("Products fatched.");
     const { limit, page } = req.query;
     const products = await findAll({}, limit, page);
-    if (!products) {
-      return errorResponse(res, 404, "Products not found.");
-    }
     return successResponse(
       res,
       200,

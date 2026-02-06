@@ -1,7 +1,6 @@
 const {
   findOne,
   updateUserById,
-  deleteUser,
   findUserById,
 } = require("../services/auth.service");
 const { logger } = require("../utils/logger");

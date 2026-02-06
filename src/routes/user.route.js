@@ -26,5 +26,4 @@ route
     validation(deleteUserSchemaValidation),
     deleteUserProfile,
   );
-
 module.exports = route;

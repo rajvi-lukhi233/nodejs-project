@@ -72,7 +72,7 @@ exports.verifyEmail = async (req, res) => {
       isVerified: true,
       emailVerifyToken: null,
     });
-    return successResponse(res, 200, "Email verified successfully");
+    return successResponse(res, 200, "Email verified successfully.");
   } catch (error) {
     logger.error(`VerifyEmailAPI Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
