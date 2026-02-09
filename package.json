@@ -16,20 +16,19 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "start": " export PORT2=3001 && node --watch --env-file=.env src/app.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
+    "git-styler": "^0.1.4",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
     "multer": "^2.0.2",
     "nodemailer": "^8.0.0",
-    "nodemon": "^3.1.11",
+    "perf-logx": "^1.0.3",
     "socket.io": "^4.8.3",
     "stripe": "^20.3.0",
     "winston": "^3.19.0"

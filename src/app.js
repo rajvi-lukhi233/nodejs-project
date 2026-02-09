@@ -1,12 +1,15 @@
-require("dotenv").config();
 const express = require("express");
 const { connectdb } = require("../config/dbConfig");
 const indexRoute = require("./routes/index");
 const path = require("path");
 const rateLimit = require("express-rate-limit");
 const { Server } = require("socket.io");
+const perfLogx = require("perf-logx");
+
 const app = express();
-const port = process.env.PORT;
+app.use(perfLogx());
+
+const port = process.env.PORT2;
 const http = require("http");
 const { initSocket } = require("./utils/socket");
 const server = http.createServer(app);

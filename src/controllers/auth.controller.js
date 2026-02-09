@@ -2,6 +2,7 @@ const {
   findOne,
   createUser,
   updateUserById,
+  findAllUsers,
 } = require("../services/auth.service");
 const { successResponse, errorResponse } = require("../utils/resUtil");
 const bcrypt = require("bcrypt");
@@ -45,8 +46,8 @@ exports.register = async (req, res) => {
     user._doc.token = token;
     if (user) {
       const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
-      const emailBody = getVerifyEmailTemplate(name, verifyLink);
-      sendMail(email, "Verify Your Email", emailBody);
+      // const emailBody = getVerifyEmailTemplate(name, verifyLink);
+      // sendMail(email, "Verify Your Email", emailBody);
       return successResponse(
         res,
         200,
@@ -129,8 +130,8 @@ exports.sendOtp = async (req, res) => {
       otpCode: otp,
       otpExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
     });
-    const emailBody = getOtpEmailTemplate(user.name, otp);
-    sendMail(email, "Forgot password OPT", emailBody);
+    // const emailBody = getOtpEmailTemplate(user.name, otp);
+    // sendMail(email, "Forgot password OPT", emailBody);
     return successResponse(
       res,
       200,
@@ -196,6 +197,18 @@ exports.forgotPassword = async (req, res) => {
     return successResponse(res, 200, "Password reset successfully.");
   } catch (error) {
     logger.error(`Forgot password API Error:${error.message}`);
+    return errorResponse(res, 500, "Internal server error");
+  }
+};
+
+exports.getUserList = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit);
+    const page = parseInt(req.query.page);
+    const users = await findAllUsers(limit, page);
+    return successResponse(res, 200, "Users list retrive successfully.", users);
+  } catch (error) {
+    logger.error(`GetUsers API Error:${error.message}`);
     return errorResponse(res, 500, "Internal server error");
   }
 };

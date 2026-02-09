@@ -6,6 +6,7 @@ const {
   sendOtp,
   verifyOtp,
   verifyEmail,
+  getUserList,
 } = require("../controllers/auth.controller");
 const { validation } = require("../middleware/validationMiddleware");
 const {
@@ -15,6 +16,8 @@ const {
   verifyOtpSchemaValidation,
   forgotPasswordSchemaValidation,
 } = require("../validation/auth.validation");
+const { authRole, auth } = require("../middleware/authMiddleware");
+const { ROLE } = require("../utils/constant");
 const route = express.Router();
 
 route
@@ -27,6 +30,7 @@ route
     validation(forgotPasswordSchemaValidation),
     forgotPassword,
   )
-  .get("/verifyEmail/:token", verifyEmail);
+  .get("/verifyEmail/:token", verifyEmail)
+  .get("/userList", getUserList);
 
 module.exports = route;
