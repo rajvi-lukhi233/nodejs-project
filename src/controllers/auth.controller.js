@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { logger } = require('../utils/logger');
-const { sendMail } = require("../utils/sendMail");
+const { sendMail } = require('../utils/sendMail');
 const { getVerifyEmailTemplate, getOtpEmailTemplate } = require('../utils/emailBody');
 
 exports.register = async (req, res) => {
