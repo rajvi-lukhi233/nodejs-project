@@ -4,12 +4,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { logger } = require('../utils/logger');
-const { sendMail } = require('../utils/sendMail');
+const { sendMail } = require("../utils/sendMail");
 const { getVerifyEmailTemplate, getOtpEmailTemplate } = require('../utils/emailBody');
 
 exports.register = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
+    //1. checking is existinvg user
     const existUser = await findOne({ email }, { id: 1 });
     if (existUser) {
       return errorResponse(
@@ -20,6 +21,8 @@ exports.register = async (req, res) => {
     }
     const verifyToken = crypto.randomBytes(32).toString('hex');
     const bcryptedPass = await bcrypt.hash(password, 10);
+
+    //2. create user
     const user = await createUser({
       name,
       email,
@@ -27,12 +30,13 @@ exports.register = async (req, res) => {
       role,
       emailVerifyToken: verifyToken,
     });
-
+    //3. generate jwt token
     let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
       expiresIn: '24h',
     });
     user._doc.token = token;
     if (user) {
+      //4.send vuser verification link
       const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
       // const emailBody = getVerifyEmailTemplate(name, verifyLink);
       // sendMail(email, "Verify Your Email", emailBody);
