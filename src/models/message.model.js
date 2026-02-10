@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { DB_NAME } = require("../utils/constant");
+const mongoose = require('mongoose');
+const { DB_NAME } = require('../utils/constant');
 
 const messageSchema = new mongoose.Schema(
   {
@@ -18,7 +18,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true, versionKey: false },
+  { timestamps: true, versionKey: false }
 );
 
 exports.messageModel = mongoose.model(DB_NAME.MESSAGE, messageSchema);

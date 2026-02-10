@@ -1,5 +1,5 @@
-const joi = require("joi");
-const { ROLE } = require("../utils/constant");
+const joi = require('joi');
+const { ROLE } = require('../utils/constant');
 
 exports.registerSchemaValidation = joi.object({
   name: joi.string().required(),

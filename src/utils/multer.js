@@ -1,8 +1,8 @@
-const path = require("path");
-const fs = require("fs");
-const multer = require("multer");
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 
-const uploadFolder = path.join(__dirname, "../public");
+const uploadFolder = path.join(__dirname, '../public');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     cb(null, uploadFolder);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "_" + file.originalname);
+    cb(null, Date.now() + '_' + file.originalname);
   },
 });
 

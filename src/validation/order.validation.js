@@ -1,4 +1,4 @@
-const joi = require("joi");
+const joi = require('joi');
 
 exports.createOrderSchemaValidation = joi.object({
   products: joi
@@ -10,7 +10,7 @@ exports.createOrderSchemaValidation = joi.object({
           .pattern(/^[0-9a-fA-F]{24}$/)
           .required(),
         quantity: joi.number().min(1).required(),
-      }),
+      })
     )
     .required(),
   shippingAddress: joi.object({
@@ -36,7 +36,7 @@ exports.updateOrderSchemaValidation = joi.object({
           .pattern(/^[0-9a-fA-F]{24}$/)
           .optional(),
         quantity: joi.number().min(1).optional(),
-      }),
+      })
     )
     .optional(),
   shippingAddress: joi.object({

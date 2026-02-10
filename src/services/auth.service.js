@@ -1,4 +1,4 @@
-const { userModel } = require("../models/users.model");
+const { userModel } = require('../models/users.model');
 
 exports.findOne = (filter, option) => {
   return userModel.findOne({ deletedAt: null, ...filter }, option);
@@ -54,14 +54,14 @@ exports.findAllUsers = async (limit = 10, page = 1) => {
             },
           },
         ],
-        totalRecord: [{ $count: "count" }],
+        totalRecord: [{ $count: 'count' }],
       },
     },
     {
       $project: {
         users: 1,
         totalRecord: {
-          $ifNull: [{ $arrayElemAt: ["$totalRecord.count", 0] }, 0],
+          $ifNull: [{ $arrayElemAt: ['$totalRecord.count', 0] }, 0],
         },
       },
     },

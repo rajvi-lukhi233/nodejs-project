@@ -1,4 +1,4 @@
-const { errorResponse } = require("../utils/resUtil");
+const { errorResponse } = require('../utils/resUtil');
 
 exports.validation = (schema) => {
   return (req, res, next) => {
@@ -14,7 +14,7 @@ exports.validation = (schema) => {
       next();
     } catch (error) {
       logger.error(`Validation Error:${error.message}`);
-      return errorResponse(res, 500, "Internal server error during validation");
+      return errorResponse(res, 500, 'Internal server error during validation');
     }
   };
 };

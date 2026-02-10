@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { DB_NAME, STATUS } = require("../utils/constant");
+const mongoose = require('mongoose');
+const { DB_NAME, STATUS } = require('../utils/constant');
 const orderSchema = mongoose.Schema(
   {
     userId: {
@@ -37,7 +37,7 @@ const orderSchema = mongoose.Schema(
       default: STATUS.PENDING,
     },
   },
-  { timestamps: true, versionKey: false },
+  { timestamps: true, versionKey: false }
 );
 orderSchema.index({ orderStatus: 1, userId: 1 });
 

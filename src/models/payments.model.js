@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { DB_NAME, STATUS } = require("../utils/constant");
+const mongoose = require('mongoose');
+const { DB_NAME, STATUS } = require('../utils/constant');
 const paymentSchema = mongoose.Schema(
   {
     userId: {
@@ -22,7 +22,7 @@ const paymentSchema = mongoose.Schema(
       default: STATUS.PENDING,
     },
   },
-  { timestamps: true, versionKey: false },
+  { timestamps: true, versionKey: false }
 );
 
 paymentSchema.index({ userId: 1, paymentStatus: 1 });

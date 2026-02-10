@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { DB_NAME, ROLE } = require("../utils/constant");
+const mongoose = require('mongoose');
+const { DB_NAME, ROLE } = require('../utils/constant');
 
 const userSchema = new mongoose.Schema(
   {
@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true, versionKey: false },
+  { timestamps: true, versionKey: false }
 );
 
 exports.userModel = mongoose.model(DB_NAME.USER, userSchema);

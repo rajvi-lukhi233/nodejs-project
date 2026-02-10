@@ -1,4 +1,4 @@
-const joi = require("joi");
+const joi = require('joi');
 
 exports.updateUserSchemaValidation = joi.object({
   userId: joi

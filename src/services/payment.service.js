@@ -1,5 +1,5 @@
-const { paymentModel } = require("../models/payments.model");
-const { DB_NAME } = require("../utils/constant");
+const { paymentModel } = require('../models/payments.model');
+const { DB_NAME } = require('../utils/constant');
 
 exports.create = (data) => {
   return paymentModel.create(data);
@@ -18,47 +18,44 @@ exports.paymentList = () => {
     {
       $lookup: {
         from: DB_NAME.USER,
-        localField: "userId",
-        foreignField: "_id",
-        as: "userDetails",
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'userDetails',
       },
     },
     {
       $lookup: {
         from: DB_NAME.ORDER,
-        localField: "orderId",
-        foreignField: "_id",
-        as: "orderDetails",
+        localField: 'orderId',
+        foreignField: '_id',
+        as: 'orderDetails',
       },
     },
-    { $unwind: "$orderDetails" },
+    { $unwind: '$orderDetails' },
     {
       $lookup: {
         from: DB_NAME.PRODUCT,
-        localField: "orderDetails.products.productId",
-        foreignField: "_id",
-        as: "productDetails",
+        localField: 'orderDetails.products.productId',
+        foreignField: '_id',
+        as: 'productDetails',
       },
     },
     {
       $addFields: {
-        userName: { $arrayElemAt: ["$userDetails.name", 0] },
-        "orderDetails.products": {
+        userName: { $arrayElemAt: ['$userDetails.name', 0] },
+        'orderDetails.products': {
           $map: {
-            input: "$orderDetails.products",
-            as: "prod",
+            input: '$orderDetails.products',
+            as: 'prod',
             in: {
               $mergeObjects: [
-                "$$prod",
+                '$$prod',
                 {
                   name: {
                     $arrayElemAt: [
-                      "$productDetails.name",
+                      '$productDetails.name',
                       {
-                        $indexOfArray: [
-                          "$productDetails._id",
-                          "$$prod.productId",
-                        ],
+                        $indexOfArray: ['$productDetails._id', '$$prod.productId'],
                       },
                     ],
                   },
@@ -66,12 +63,9 @@ exports.paymentList = () => {
                 {
                   price: {
                     $arrayElemAt: [
-                      "$productDetails.price",
+                      '$productDetails.price',
                       {
-                        $indexOfArray: [
-                          "$productDetails._id",
-                          "$$prod.productId",
-                        ],
+                        $indexOfArray: ['$productDetails._id', '$$prod.productId'],
                       },
                     ],
                   },
@@ -90,7 +84,7 @@ exports.paymentList = () => {
         orderId: 1,
         userName: 1,
         userId: 1,
-        "orderDetails.products": 1,
+        'orderDetails.products': 1,
       },
     },
   ]);

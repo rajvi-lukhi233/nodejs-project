@@ -1,7 +1,7 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -17,8 +17,8 @@ exports.sendMail = async (email, subject, body) => {
       html: body,
     };
     await transporter.sendMail(mailOption);
-    console.log("Email sending successfully.");
+    console.log('Email sending successfully.');
   } catch (error) {
-    console.log("Faild to send email:", error);
+    console.log('Faild to send email:', error);
   }
 };
