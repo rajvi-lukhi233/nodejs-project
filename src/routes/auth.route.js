@@ -1,5 +1,5 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   register,
   login,
   forgotPassword,
@@ -7,17 +7,15 @@ const {
   verifyOtp,
   verifyEmail,
   getUserList,
-} = require('../controllers/auth.controller');
-const { validation } = require('../middleware/validationMiddleware');
-const {
+} from '../controllers/auth.controller.js';
+import { validation } from '../middleware/validationMiddleware.js';
+import {
   registerSchemaValidation,
   loginSchemaValidation,
   sendOtpSchemaValidation,
   verifyOtpSchemaValidation,
   forgotPasswordSchemaValidation,
-} = require('../validation/auth.validation');
-const { authRole, auth } = require('../middleware/authMiddleware');
-const { ROLE } = require('../utils/constant');
+} from '../validation/auth.validation.js';
 const route = express.Router();
 
 route
@@ -29,4 +27,4 @@ route
   .get('/verifyEmail/:token', verifyEmail)
   .get('/userList', getUserList);
 
-module.exports = route;
+export default route;

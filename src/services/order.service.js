@@ -1,12 +1,12 @@
-const { default: mongoose } = require('mongoose');
-const { orderModel } = require('../models/orders.model');
-const { DB_NAME, ROLE } = require('../utils/constant');
+import mongoose from 'mongoose';
+import { orderModel } from '../models/orders.model.js';
+import { DB_NAME, ROLE } from '../utils/constant.js';
 
-exports.create = (data) => {
+export const create = (data) => {
   return orderModel.create(data);
 };
 
-exports.findAllOrders = (userId, role) => {
+export const findAllOrders = (userId, role) => {
   const pipeline = [];
   if (role == ROLE.USER) {
     pipeline.push({
@@ -87,19 +87,19 @@ exports.findAllOrders = (userId, role) => {
   return orderModel.aggregate(pipeline);
 };
 
-exports.findOrderById = (id, option) => {
+export const findOrderById = (id, option) => {
   return orderModel.findById(id, option).populate('products.productId', 'name price');
 };
 
-exports.updateById = (id, data) => {
+export const updateById = (id, data) => {
   return orderModel.findByIdAndUpdate(id, data, { new: true });
 };
 
-exports.deleteById = (id) => {
+export const deleteById = (id) => {
   return orderModel.findByIdAndDelete(id);
 };
 
-exports.findOrderByUser = () => {
+export const findOrderByUser = () => {
   return orderModel.aggregate([
     {
       $group: {

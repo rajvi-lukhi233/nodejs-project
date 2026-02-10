@@ -1,10 +1,10 @@
-const express = require('express');
-const { auth } = require('../middleware/authMiddleware');
-const {
+import express from 'express';
+import { auth } from '../middleware/authMiddleware.js';
+import {
   createCheckoutPayment,
   webhook,
   getPaymentList,
-} = require('../controllers/payment.controller');
+} from '../controllers/payment.controller.js';
 const route = express.Router();
 
 route
@@ -12,4 +12,4 @@ route
   .post('/create-chekcout-payment', auth, createCheckoutPayment)
   .post('/webhook', webhook);
 
-module.exports = route;
+export default route;

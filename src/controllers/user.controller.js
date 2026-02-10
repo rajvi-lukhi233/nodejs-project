@@ -1,8 +1,8 @@
-const { findOne, updateUserById, findUserById } = require('../services/auth.service');
-const { logger } = require('../utils/logger');
-const { errorResponse, successResponse } = require('../utils/resUtil');
+import { findOne, updateUserById, findUserById } from '../services/auth.service.js';
+import { logger } from '../utils/logger.js';
+import { errorResponse, successResponse } from '../utils/resUtil.js';
 
-exports.getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
   try {
     const { userId } = req.user;
     const user = await findOne({ _id: userId });
@@ -16,7 +16,7 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-exports.updateUserProfile = async (req, res) => {
+export const updateUserProfile = async (req, res) => {
   try {
     logger.info('User updated.');
     const { userId } = req.params;
@@ -38,7 +38,7 @@ exports.updateUserProfile = async (req, res) => {
   }
 };
 
-exports.deleteUserProfile = async (req, res) => {
+export const deleteUserProfile = async (req, res) => {
   try {
     logger.info('User deleted.');
     const { userId } = req.params;

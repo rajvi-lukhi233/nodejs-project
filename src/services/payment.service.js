@@ -1,19 +1,19 @@
-const { paymentModel } = require('../models/payments.model');
-const { DB_NAME } = require('../utils/constant');
+import { paymentModel } from '../models/payments.model.js';
+import { DB_NAME } from '../utils/constant.js';
 
-exports.create = (data) => {
+export const create = (data) => {
   return paymentModel.create(data);
 };
 
-exports.updatePayment = (filter, data) => {
+export const updatePayment = (filter, data) => {
   return paymentModel.findOneAndUpdate(filter, data, { new: true });
 };
 
-exports.findPayment = (filter, option) => {
+export const findPayment = (filter, option) => {
   return paymentModel.findOne(filter, option);
 };
 
-exports.paymentList = () => {
+export const paymentList = () => {
   return paymentModel.aggregate([
     {
       $lookup: {

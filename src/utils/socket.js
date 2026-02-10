@@ -1,6 +1,6 @@
-const { createMessage } = require('../services/message.service');
+import { createMessage } from '../services/message.service.js';
 
-exports.initSocket = (io) => {
+export const initSocket = (io) => {
   io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId;
     console.log('Socket connected:', socket.id);

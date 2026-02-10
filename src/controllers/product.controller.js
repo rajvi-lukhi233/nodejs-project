@@ -1,16 +1,16 @@
-const path = require('path');
-const fs = require('fs');
-const {
+import path from 'path';
+import fs from 'fs';
+import {
   createProduct,
   updateProductById,
   deleteById,
   findAll,
   findProductById,
-} = require('../services/product.service');
-const { successResponse, errorResponse } = require('../utils/resUtil');
-const { logger } = require('../utils/logger');
+} from '../services/product.service.js';
+import { successResponse, errorResponse } from '../utils/resUtil.js';
+import { logger } from '../utils/logger.js';
 
-exports.getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
   try {
     logger.info('Products fatched.');
     const { limit, page } = req.query;
@@ -22,7 +22,7 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-exports.addProduct = async (req, res) => {
+export const addProduct = async (req, res) => {
   try {
     logger.info('Product added.');
     const { name, price, stock, description, category } = req.body;
@@ -45,7 +45,7 @@ exports.addProduct = async (req, res) => {
   }
 };
 
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     logger.info('Product updated.');
     const { productId } = req.params;
@@ -78,7 +78,7 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     logger.info('Product deleted.');
     const { productId } = req.params;

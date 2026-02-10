@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DB_NAME, STATUS } = require('../utils/constant');
+import mongoose from 'mongoose';
+import { DB_NAME, STATUS } from '../utils/constant.js';
 const paymentSchema = mongoose.Schema(
   {
     userId: {
@@ -27,4 +27,4 @@ const paymentSchema = mongoose.Schema(
 
 paymentSchema.index({ userId: 1, paymentStatus: 1 });
 
-exports.paymentModel = mongoose.model(DB_NAME.PAYMENT, paymentSchema);
+export const paymentModel = mongoose.model(DB_NAME.PAYMENT, paymentSchema);

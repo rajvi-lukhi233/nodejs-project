@@ -1,13 +1,13 @@
-const Stripe = require('stripe');
-const { STATUS } = require('../utils/constant');
-const { findOrderById, updateById } = require('../services/order.service');
-const { create, updatePayment, findPayment, paymentList } = require('../services/payment.service');
-const { errorResponse, successResponse } = require('../utils/resUtil');
-const { logger } = require('../utils/logger');
-const { findOne, updateUserById } = require('../services/auth.service');
+import Stripe from 'stripe';
+import { STATUS } from '../utils/constant.js';
+import { findOrderById, updateById } from '../services/order.service.js';
+import { create, updatePayment, findPayment, paymentList } from '../services/payment.service.js';
+import { errorResponse, successResponse } from '../utils/resUtil.js';
+import { logger } from '../utils/logger.js';
+// import { findOne, updateUserById } from '../services/auth.service.js';
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
-exports.getPaymentList = async (req, res) => {
+export const getPaymentList = async (req, res) => {
   try {
     const payment = await paymentList();
     if (!paymentList) {
@@ -20,7 +20,7 @@ exports.getPaymentList = async (req, res) => {
   }
 };
 
-exports.createCheckoutPayment = async (req, res) => {
+export const createCheckoutPayment = async (req, res) => {
   try {
     const { orderId } = req.body;
     const order = await findOrderById(orderId);
@@ -65,7 +65,7 @@ exports.createCheckoutPayment = async (req, res) => {
 
 //-----------using payment-intenet-method--------------------//
 
-// exports.createPaymentIntent = async (req, res) => {
+// export const createPaymentIntent = async (req, res) => {
 //   try {
 //     const { orderId } = req.body;
 //     const { userId } = req.user;
@@ -94,13 +94,14 @@ exports.createCheckoutPayment = async (req, res) => {
 //   }
 // };
 
-exports.webhook = async (req, res) => {
+export const webhook = async (req, res) => {
   try {
     let event = req.body;
+    const session = event.data.object;
+    const orderId = session.metadata.orderId;
     if (event.type == 'checkout.session.completed') {
       // if (event.type === "payment_intent.succeeded") {
-      const session = event.data.object;
-      const orderId = session.metadata.orderId;
+
       await updateById(orderId, {
         orderStatus: STATUS.COMPLETED,
       });
@@ -110,7 +111,6 @@ exports.webhook = async (req, res) => {
     }
     if (event.type == 'checkout.session.async_payment_failed') {
       // if (event.type === "payment_intent.payment_failed") {
-      const orderId = session.metadata.orderId;
       await updateById(orderId, { orderStatus: STATUS.FAILED });
       await updatePayment({ orderId: orderId }, { paymentStatus: STATUS.FAILED });
       logger.error('Payment failed.');

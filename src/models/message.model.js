@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DB_NAME } = require('../utils/constant');
+import mongoose from 'mongoose';
+import { DB_NAME } from '../utils/constant.js';
 
 const messageSchema = new mongoose.Schema(
   {
@@ -21,4 +21,4 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-exports.messageModel = mongoose.model(DB_NAME.MESSAGE, messageSchema);
+export const messageModel = mongoose.model(DB_NAME.MESSAGE, messageSchema);

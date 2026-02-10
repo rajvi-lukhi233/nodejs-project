@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
-const { messageModel } = require('../models/message.model');
+import mongoose from 'mongoose';
+import { messageModel } from '../models/message.model.js';
 
-exports.createMessage = (data) => {
+export const createMessage = (data) => {
   return messageModel.create(data);
 };
 
-exports.findAllMessage = (userId) => {
+export const findAllMessage = (userId) => {
   return messageModel
     .find({
       $or: [

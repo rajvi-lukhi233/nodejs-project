@@ -1,19 +1,19 @@
-const express = require('express');
-const { validation } = require('../middleware/validationMiddleware');
-const {
+import express from 'express';
+import { validation } from '../middleware/validationMiddleware.js';
+import {
   addProduct,
   updateProduct,
   deleteProduct,
   getAllProducts,
-} = require('../controllers/product.controller');
-const {
+} from '../controllers/product.controller.js';
+import {
   productSchemaValidation,
   updateProductSchemaValidation,
   deleteProductSchemaValidation,
-} = require('../validation/product.validation');
-const { upload } = require('../utils/multer');
-const { auth, authRole } = require('../middleware/authMiddleware');
-const { ROLE } = require('../utils/constant');
+} from '../validation/product.validation.js';
+import { upload } from '../utils/multer.js';
+import { auth, authRole } from '../middleware/authMiddleware.js';
+import { ROLE } from '../utils/constant.js';
 const route = express.Router();
 
 route
@@ -42,4 +42,4 @@ route
     deleteProduct
   );
 
-module.exports = route;
+export default route;

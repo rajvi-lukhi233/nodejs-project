@@ -1,13 +1,13 @@
-const { findOne, createUser, updateUserById, findAllUsers } = require('../services/auth.service');
-const { successResponse, errorResponse } = require('../utils/resUtil');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const { logger } = require('../utils/logger');
-const { sendMail } = require('../utils/sendMail');
-const { getVerifyEmailTemplate, getOtpEmailTemplate } = require('../utils/emailBody');
+import { findOne, createUser, updateUserById, findAllUsers } from '../services/auth.service.js';
+import { successResponse, errorResponse } from '../utils/resUtil.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { logger } from '../utils/logger.js';
+// import { sendMail } from '../utils/sendMail.js';
+// import { getVerifyEmailTemplate, getOtpEmailTemplate } from '../utils/emailBody.js';
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
     //1. checking is existinvg user
@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
     user._doc.token = token;
     if (user) {
       //4.send vuser verification link
-      const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
+      // const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
       // const emailBody = getVerifyEmailTemplate(name, verifyLink);
       // sendMail(email, "Verify Your Email", emailBody);
       return successResponse(
@@ -54,7 +54,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.verifyEmail = async (req, res) => {
+export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
     const user = await findOne({ emailVerifyToken: token }, { id: 1 });
@@ -72,7 +72,7 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     let { email, password } = req.body;
     let user = await findOne({ email });
@@ -106,7 +106,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.sendOtp = async (req, res) => {
+export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await findOne({ email });
@@ -129,7 +129,7 @@ exports.sendOtp = async (req, res) => {
   }
 };
 
-exports.verifyOtp = async (req, res) => {
+export const verifyOtp = async (req, res) => {
   try {
     const { otp, email } = req.body;
     const resetPassToken = crypto.randomBytes(32).toString('hex');
@@ -158,7 +158,7 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
-exports.forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
   try {
     const { newPassword, token } = req.body;
     const user = await findOne({ resetPassToken: token });
@@ -182,7 +182,7 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-exports.getUserList = async (req, res) => {
+export const getUserList = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit);
     const page = parseInt(req.query.page);

@@ -1,17 +1,21 @@
-const express = require('express');
-const { connectdb } = require('../config/dbConfig');
-const indexRoute = require('./routes/index');
-const path = require('path');
-const rateLimit = require('express-rate-limit');
-const { Server } = require('socket.io');
-const perfLogx = require('perf-logx');
+import express from 'express';
+import indexRoute from './routes/index.js';
+import path from 'path';
+import rateLimit from 'express-rate-limit';
+import { Server } from 'socket.io';
+import perfLogx from 'perf-logx';
+import { connectdb } from '../config/dbConfig.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(perfLogx());
 
 const port = process.env.PORT2;
-const http = require('http');
-const { initSocket } = require('./utils/socket');
+import http from 'http';
+import { initSocket } from './utils/socket.js';
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {

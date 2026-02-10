@@ -1,16 +1,16 @@
-const {
+import {
   create,
   findAllOrders,
   updateById,
   deleteById,
   findOrderById,
   findOrderByUser,
-} = require('../services/order.service');
-const { findProductById } = require('../services/product.service');
-const { logger } = require('../utils/logger');
-const { errorResponse, successResponse } = require('../utils/resUtil');
+} from '../services/order.service.js';
+import { findProductById } from '../services/product.service.js';
+import { logger } from '../utils/logger.js';
+import { errorResponse, successResponse } from '../utils/resUtil.js';
 
-exports.getAllOrders = async (req, res) => {
+export const getAllOrders = async (req, res) => {
   try {
     logger.info('Orderes fatched.');
     const { userId, role } = req.user;
@@ -22,13 +22,13 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-exports.craeteOrder = async (req, res) => {
+export const craeteOrder = async (req, res) => {
   try {
     logger.info('Ordere created.');
     const { products, shippingAddress } = req.body;
     const { userId } = req.user;
     let totalAmount = 0;
-    for (item of products) {
+    for (let item of products) {
       const product = await findProductById(item.productId);
       if (!product) {
         return errorResponse(res, 404, `This product is not found:${item.productId}`);
@@ -51,7 +51,7 @@ exports.craeteOrder = async (req, res) => {
   }
 };
 
-exports.updateOrder = async (req, res) => {
+export const updateOrder = async (req, res) => {
   try {
     logger.info('Ordere updated.');
     const { orderId } = req.params;
@@ -63,7 +63,7 @@ exports.updateOrder = async (req, res) => {
       return errorResponse(res, 404, 'Order not found.');
     }
     if (products) {
-      for (item of products) {
+      for (let item of products) {
         const product = await findProductById(item.productId);
         if (!product) {
           return errorResponse(res, 404, `Thisproduct not found:${item.productId}`);
@@ -87,7 +87,7 @@ exports.updateOrder = async (req, res) => {
   }
 };
 
-exports.deleteOrder = async (req, res) => {
+export const deleteOrder = async (req, res) => {
   try {
     logger.info('Orderes deleted.');
     const { orderId } = req.params;
@@ -103,7 +103,7 @@ exports.deleteOrder = async (req, res) => {
   }
 };
 
-exports.getUserWiseOrder = async (req, res) => {
+export const getUserWiseOrder = async (req, res) => {
   try {
     const orders = await findOrderByUser();
     if (!orders || orders.length == 0) {

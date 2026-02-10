@@ -1,7 +1,7 @@
-const joi = require('joi');
-const { ROLE } = require('../utils/constant');
+import joi from 'joi';
+import { ROLE } from '../utils/constant.js';
 
-exports.registerSchemaValidation = joi.object({
+export const registerSchemaValidation = joi.object({
   name: joi.string().required(),
   email: joi.string().email().required(),
   password: joi.string().min(6).required(),
@@ -11,21 +11,21 @@ exports.registerSchemaValidation = joi.object({
     .default(ROLE.USER),
 });
 
-exports.loginSchemaValidation = joi.object({
+export const loginSchemaValidation = joi.object({
   email: joi.string().required(),
   password: joi.string().min(6).required(),
 });
 
-exports.sendOtpSchemaValidation = joi.object({
+export const sendOtpSchemaValidation = joi.object({
   email: joi.string().required(),
 });
 
-exports.verifyOtpSchemaValidation = joi.object({
+export const verifyOtpSchemaValidation = joi.object({
   email: joi.string().required(),
   otp: joi.string().required(),
 });
 
-exports.forgotPasswordSchemaValidation = joi.object({
+export const forgotPasswordSchemaValidation = joi.object({
   token: joi.string().required(),
   newPassword: joi.string().min(6).required(),
 });

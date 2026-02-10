@@ -1,19 +1,19 @@
-const express = require('express');
-const { auth, authRole } = require('../middleware/authMiddleware');
-const {
+import express from 'express';
+import { auth, authRole } from '../middleware/authMiddleware.js';
+import {
   craeteOrder,
   getAllOrders,
   updateOrder,
   deleteOrder,
   getUserWiseOrder,
-} = require('../controllers/order.controller');
-const { validation } = require('../middleware/validationMiddleware');
-const {
+} from '../controllers/order.controller.js';
+import { validation } from '../middleware/validationMiddleware.js';
+import {
   createOrderSchemaValidation,
   updateOrderSchemaValidation,
   deleteOrderSchemaValidation,
-} = require('../validation/order.validation');
-const { ROLE } = require('../utils/constant');
+} from '../validation/order.validation.js';
+import { ROLE } from '../utils/constant.js';
 const route = express.Router();
 
 route
@@ -22,4 +22,5 @@ route
   .post('/', auth, validation(createOrderSchemaValidation), craeteOrder)
   .put('/:orderId', auth, validation(updateOrderSchemaValidation), updateOrder)
   .delete('/:orderId', auth, validation(deleteOrderSchemaValidation), deleteOrder);
-module.exports = route;
+
+export default route;

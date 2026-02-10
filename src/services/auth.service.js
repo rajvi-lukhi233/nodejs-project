@@ -1,21 +1,21 @@
-const { userModel } = require('../models/users.model');
+import { userModel } from '../models/users.model.js';
 
-exports.findOne = (filter, option) => {
+export const findOne = (filter, option) => {
   return userModel.findOne({ deletedAt: null, ...filter }, option);
 };
-exports.createUser = (data) => {
+export const createUser = (data) => {
   return userModel.create(data);
 };
-exports.updateUserById = (id, data) => {
+export const updateUserById = (id, data) => {
   return userModel.findByIdAndUpdate(id, data, { new: true });
 };
-exports.deleteUser = (id) => {
+export const deleteUser = (id) => {
   return userModel.findByIdAndDelete(id);
 };
-exports.findUserById = (id, option) => {
+export const findUserById = (id, option) => {
   return userModel.findById(id, option);
 };
-// exports.findAllUsers = async (limit = 10, page = 1) => {
+// export const findAllUsers = async (limit = 10, page = 1) => {
 //   const skip = (page - 1) * limit;
 //   const filter = { deletedAt: null };
 //   const [users, totalRecord] = await Promise.all([
@@ -30,7 +30,7 @@ exports.findUserById = (id, option) => {
 //   };
 // };
 
-exports.findAllUsers = async (limit = 10, page = 1) => {
+export const findAllUsers = async (limit = 10, page = 1) => {
   const skip = (page - 1) * limit;
   const result = await userModel.aggregate([
     {

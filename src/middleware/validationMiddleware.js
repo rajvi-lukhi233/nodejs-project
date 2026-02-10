@@ -1,6 +1,7 @@
-const { errorResponse } = require('../utils/resUtil');
+import { logger } from '../utils/logger.js';
+import { errorResponse } from '../utils/resUtil.js';
 
-exports.validation = (schema) => {
+export const validation = (schema) => {
   return (req, res, next) => {
     try {
       const { error } = schema.validate({

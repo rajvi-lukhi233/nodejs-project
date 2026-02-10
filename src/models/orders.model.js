@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DB_NAME, STATUS } = require('../utils/constant');
+import mongoose from 'mongoose';
+import { DB_NAME, STATUS } from '../utils/constant.js';
 const orderSchema = mongoose.Schema(
   {
     userId: {
@@ -41,4 +41,4 @@ const orderSchema = mongoose.Schema(
 );
 orderSchema.index({ orderStatus: 1, userId: 1 });
 
-exports.orderModel = mongoose.model(DB_NAME.ORDER, orderSchema);
+export const orderModel = mongoose.model(DB_NAME.ORDER, orderSchema);

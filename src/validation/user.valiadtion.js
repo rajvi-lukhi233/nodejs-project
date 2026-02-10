@@ -1,6 +1,6 @@
-const joi = require('joi');
+import joi from 'joi';
 
-exports.updateUserSchemaValidation = joi.object({
+export const updateUserSchemaValidation = joi.object({
   userId: joi
     .string()
     .pattern(/^[0-9a-fA-F]{24}$/)
@@ -9,7 +9,7 @@ exports.updateUserSchemaValidation = joi.object({
   email: joi.string().email().optional(),
 });
 
-exports.deleteUserSchemaValidation = joi.object({
+export const deleteUserSchemaValidation = joi.object({
   userId: joi
     .string()
     .pattern(/^[0-9a-fA-F]{24}$/)

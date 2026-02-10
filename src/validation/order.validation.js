@@ -1,6 +1,6 @@
-const joi = require('joi');
+import joi from 'joi';
 
-exports.createOrderSchemaValidation = joi.object({
+export const createOrderSchemaValidation = joi.object({
   products: joi
     .array()
     .items(
@@ -22,7 +22,7 @@ exports.createOrderSchemaValidation = joi.object({
   }),
 });
 
-exports.updateOrderSchemaValidation = joi.object({
+export const updateOrderSchemaValidation = joi.object({
   orderId: joi
     .string()
     .pattern(/^[0-9a-fA-F]{24}$/)
@@ -48,7 +48,7 @@ exports.updateOrderSchemaValidation = joi.object({
   }),
 });
 
-exports.deleteOrderSchemaValidation = joi.object({
+export const deleteOrderSchemaValidation = joi.object({
   orderId: joi
     .string()
     .pattern(/^[0-9a-fA-F]{24}$/)

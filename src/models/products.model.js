@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DB_NAME } = require('../utils/constant');
+import mongoose from 'mongoose';
+import { DB_NAME } from '../utils/constant.js';
 const productSchema = mongoose.Schema(
   {
     name: {
@@ -27,7 +27,12 @@ const productSchema = mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true, versionKey: false, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-exports.productModel = mongoose.model(DB_NAME.PRODUCT, productSchema);
+productSchema.virtual('imageUrl').get(function () {
+  if (!this.image) return null;
+  return `${process.env.BASE_URL}/public/${this.image}`;
+});
+
+export const productModel = mongoose.model(DB_NAME.PRODUCT, productSchema);

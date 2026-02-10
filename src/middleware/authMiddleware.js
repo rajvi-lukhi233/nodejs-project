@@ -1,7 +1,8 @@
-const { findOne } = require('../services/auth.service');
-const { errorResponse } = require('../utils/resUtil');
-const jwt = require('jsonwebtoken');
-exports.auth = async (req, res, next) => {
+import { findOne } from '../services/auth.service.js';
+import { logger } from '../utils/logger.js';
+import { errorResponse } from '../utils/resUtil.js';
+import jwt from 'jsonwebtoken';
+export const auth = async (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1];
   if (!token) {
     errorResponse(res, 401, 'Access denied. No authorization token provided ');
@@ -23,7 +24,7 @@ exports.auth = async (req, res, next) => {
   }
 };
 
-exports.authRole = (roles = []) => {
+export const authRole = (roles = []) => {
   return async (req, res, next) => {
     try {
       if (!roles.includes(req.user.role)) {

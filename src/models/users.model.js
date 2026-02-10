@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DB_NAME, ROLE } = require('../utils/constant');
+import mongoose from 'mongoose';
+import { DB_NAME, ROLE } from '../utils/constant.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -53,4 +53,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-exports.userModel = mongoose.model(DB_NAME.USER, userSchema);
+export const userModel = mongoose.model(DB_NAME.USER, userSchema);

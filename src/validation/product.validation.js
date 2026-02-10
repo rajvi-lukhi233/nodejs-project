@@ -1,6 +1,6 @@
-const joi = require('joi');
+import joi from 'joi';
 
-exports.productSchemaValidation = joi.object({
+export const productSchemaValidation = joi.object({
   name: joi.string().required(),
   image: joi.string().optional(),
   price: joi.number().required(),
@@ -9,7 +9,7 @@ exports.productSchemaValidation = joi.object({
   category: joi.string().required(),
 });
 
-exports.updateProductSchemaValidation = joi.object({
+export const updateProductSchemaValidation = joi.object({
   productId: joi
     .string()
     .pattern(/^[0-9a-fA-F]{24}$/)
@@ -22,7 +22,7 @@ exports.updateProductSchemaValidation = joi.object({
   category: joi.string().optional(),
 });
 
-exports.deleteProductSchemaValidation = joi.object({
+export const deleteProductSchemaValidation = joi.object({
   productId: joi
     .string()
     .pattern(/^[0-9a-fA-F]{24}$/)

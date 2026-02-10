@@ -1,8 +1,8 @@
-const { findAllMessage } = require('../services/message.service');
-const { logger } = require('../utils/logger');
-const { errorResponse, successResponse } = require('../utils/resUtil');
+import { findAllMessage } from '../services/message.service.js';
+import { logger } from '../utils/logger.js';
+import { errorResponse, successResponse } from '../utils/resUtil.js';
 
-exports.getMessageList = async (req, res) => {
+export const getMessageList = async (req, res) => {
   try {
     const { userId } = req.user;
     const list = await findAllMessage(userId);

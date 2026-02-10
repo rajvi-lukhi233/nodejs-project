@@ -1,4 +1,4 @@
-exports.getVerifyEmailTemplate = (name, verifyLink) => {
+export const getVerifyEmailTemplate = (name, verifyLink) => {
   return `
   <!DOCTYPE html>
   <html>
@@ -72,7 +72,7 @@ exports.getVerifyEmailTemplate = (name, verifyLink) => {
   `;
 };
 
-exports.getOtpEmailTemplate = (name, otp) => {
+export const getOtpEmailTemplate = (name, otp) => {
   return `
   <!DOCTYPE html>
   <html>
