@@ -16,7 +16,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": " export PORT2=3001 && node --watch --env-file=.env src/app.js"
+    "start": " export PORT2=3001 && node --watch --env-file=.env src/app.js",
+    "prepare": "husky"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -32,5 +33,9 @@
     "socket.io": "^4.8.3",
     "stripe": "^20.3.0",
     "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "prettier": "^3.8.1"
   }
 }
