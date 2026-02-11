@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/e-commerce
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db # if not do this then delete all data when stop container
+volumes:
+  mongo-data:
