@@ -3,7 +3,6 @@ import { successResponse, errorResponse } from '../utils/resUtil.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { logger } from '../utils/logger.js';
 // import { sendMail } from '../utils/sendMail.js';
 // import { getVerifyEmailTemplate, getOtpEmailTemplate } from '../utils/emailBody.js';
 
@@ -49,7 +48,6 @@ export const register = async (req, res) => {
     }
     return errorResponse(res, 400, 'User not registered');
   } catch (error) {
-    logger.error(`Register API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -67,7 +65,6 @@ export const verifyEmail = async (req, res) => {
     });
     return successResponse(res, 200, 'Email verified successfully.');
   } catch (error) {
-    logger.error(`VerifyEmailAPI Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -98,10 +95,8 @@ export const login = async (req, res) => {
       role: user.role,
       token,
     };
-    logger.info('User login.');
     return successResponse(res, 200, 'User login successfully.', userResponse);
   } catch (error) {
-    logger.error(`Login API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -124,7 +119,6 @@ export const sendOtp = async (req, res) => {
       otp,
     });
   } catch (error) {
-    logger.error(`Send OTP API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -153,7 +147,6 @@ export const verifyOtp = async (req, res) => {
       token: resetPassToken,
     });
   } catch (error) {
-    logger.error(`Verify OTP API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -177,7 +170,6 @@ export const forgotPassword = async (req, res) => {
 
     return successResponse(res, 200, 'Password reset successfully.');
   } catch (error) {
-    logger.error(`Forgot password API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -189,7 +181,6 @@ export const getUserList = async (req, res) => {
     const users = await findAllUsers(limit, page);
     return successResponse(res, 200, 'Users list retrive successfully.', users);
   } catch (error) {
-    logger.error(`GetUsers API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

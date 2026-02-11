@@ -8,23 +8,19 @@ import {
   findProductById,
 } from '../services/product.service.js';
 import { successResponse, errorResponse } from '../utils/resUtil.js';
-import { logger } from '../utils/logger.js';
 
 export const getAllProducts = async (req, res) => {
   try {
-    logger.info('Products fatched.');
     const { limit, page } = req.query;
     const products = await findAll({}, limit, page);
     return successResponse(res, 200, 'Product list retrive successfully.', products);
   } catch (error) {
-    logger.error(`ProductList API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
 
 export const addProduct = async (req, res) => {
   try {
-    logger.info('Product added.');
     const { name, price, stock, description, category } = req.body;
     const image = req.file?.filename;
     const product = await createProduct({
@@ -40,14 +36,12 @@ export const addProduct = async (req, res) => {
     }
     return errorResponse(res, 400, 'Product not added.');
   } catch (error) {
-    logger.error(`AddProduct API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
 
 export const updateProduct = async (req, res) => {
   try {
-    logger.info('Product updated.');
     const { productId } = req.params;
     const { name, price, stock, description, category } = req.body;
     const newImage = req.file?.filename;
@@ -73,14 +67,12 @@ export const updateProduct = async (req, res) => {
     });
     return successResponse(res, 200, 'Prouct details updated successfully.', updatedProduct);
   } catch (error) {
-    logger.error(`UpdateProduct API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
 
 export const deleteProduct = async (req, res) => {
   try {
-    logger.info('Product deleted.');
     const { productId } = req.params;
     const product = await findProductById(productId, { id: 1 });
     if (!product) {
@@ -89,7 +81,6 @@ export const deleteProduct = async (req, res) => {
     await deleteById(productId);
     return successResponse(res, 200, 'Product deleted successfully.');
   } catch (error) {
-    logger.error(`DeleteProduct API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };

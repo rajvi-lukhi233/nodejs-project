@@ -1,5 +1,4 @@
 import { findOne, updateUserById, findUserById } from '../services/auth.service.js';
-import { logger } from '../utils/logger.js';
 import { errorResponse, successResponse } from '../utils/resUtil.js';
 
 export const getUserProfile = async (req, res) => {
@@ -11,14 +10,12 @@ export const getUserProfile = async (req, res) => {
     }
     return successResponse(res, 200, 'User profile retrive successfully', user);
   } catch (error) {
-    logger.error(`getUserProfile API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
 
 export const updateUserProfile = async (req, res) => {
   try {
-    logger.info('User updated.');
     const { userId } = req.params;
     const { name, email } = req.body;
     if (email) {
@@ -33,14 +30,12 @@ export const updateUserProfile = async (req, res) => {
     }
     return errorResponse(res, 400, 'User profile not updated');
   } catch (error) {
-    logger.error(`updateUserProfile API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
 
 export const deleteUserProfile = async (req, res) => {
   try {
-    logger.info('User deleted.');
     const { userId } = req.params;
     const user = await findUserById(userId, { id: 1 });
     if (!user) {
@@ -49,7 +44,6 @@ export const deleteUserProfile = async (req, res) => {
     await updateUserById(userId, { deletedAt: Date.now() });
     return successResponse(res, 200, 'User deleted successfully.');
   } catch (error) {
-    logger.error(`deleteUserProfile API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

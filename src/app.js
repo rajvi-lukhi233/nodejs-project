@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(perfLogx());
 
-const port = process.env.PORT2;
+const port = process.env.PORT;
 import http from 'http';
 import { initSocket } from './utils/socket.js';
 const server = http.createServer(app);

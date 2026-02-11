@@ -7,24 +7,20 @@ import {
   findOrderByUser,
 } from '../services/order.service.js';
 import { findProductById } from '../services/product.service.js';
-import { logger } from '../utils/logger.js';
 import { errorResponse, successResponse } from '../utils/resUtil.js';
 
 export const getAllOrders = async (req, res) => {
   try {
-    logger.info('Orderes fatched.');
     const { userId, role } = req.user;
     const orders = await findAllOrders(userId, role);
     return successResponse(res, 200, 'Orders list retrive successfully.', orders);
   } catch (error) {
-    logger.error(`getAllOrders API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
 
 export const craeteOrder = async (req, res) => {
   try {
-    logger.info('Ordere created.');
     const { products, shippingAddress } = req.body;
     const { userId } = req.user;
     let totalAmount = 0;
@@ -46,14 +42,12 @@ export const craeteOrder = async (req, res) => {
     }
     return errorResponse(res, 400, 'Order not created.');
   } catch (error) {
-    logger.error(`craeteOrder API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
 
 export const updateOrder = async (req, res) => {
   try {
-    logger.info('Ordere updated.');
     const { orderId } = req.params;
     const { products, shippingAddress } = req.body;
     const { userId } = req.user;
@@ -82,14 +76,12 @@ export const updateOrder = async (req, res) => {
     }
     return errorResponse(res, 400, 'Order not updated.');
   } catch (error) {
-    logger.error(`updateOrder API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
 
 export const deleteOrder = async (req, res) => {
   try {
-    logger.info('Orderes deleted.');
     const { orderId } = req.params;
     const order = await findOrderById(orderId, { id: 1 });
     if (!order) {
@@ -98,7 +90,6 @@ export const deleteOrder = async (req, res) => {
     await deleteById(orderId);
     return successResponse(res, 200, 'Order deleted successfully.');
   } catch (error) {
-    logger.error(`deleteOrder API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -111,7 +102,6 @@ export const getUserWiseOrder = async (req, res) => {
     }
     return successResponse(res, 200, 'Order list retrive successfully.', orders);
   } catch (error) {
-    logger.error(`getUserWiseOrder API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };

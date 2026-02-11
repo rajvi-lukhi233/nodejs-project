@@ -1,5 +1,4 @@
 import { findAllMessage } from '../services/message.service.js';
-import { logger } from '../utils/logger.js';
 import { errorResponse, successResponse } from '../utils/resUtil.js';
 
 export const getMessageList = async (req, res) => {
@@ -8,7 +7,6 @@ export const getMessageList = async (req, res) => {
     const list = await findAllMessage(userId);
     return successResponse(res, 200, 'List retrive successfully.', list);
   } catch (error) {
-    logger.error(`getMessageList Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

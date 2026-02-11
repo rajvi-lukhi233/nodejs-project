@@ -1,4 +1,3 @@
-import { logger } from '../utils/logger.js';
 import { errorResponse } from '../utils/resUtil.js';
 
 export const validation = (schema) => {
@@ -14,7 +13,6 @@ export const validation = (schema) => {
       }
       next();
     } catch (error) {
-      logger.error(`Validation Error:${error.message}`);
       return errorResponse(res, 500, 'Internal server error during validation');
     }
   };

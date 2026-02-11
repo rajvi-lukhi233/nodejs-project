@@ -1,5 +1,4 @@
 import { findOne } from '../services/auth.service.js';
-import { logger } from '../utils/logger.js';
 import { errorResponse } from '../utils/resUtil.js';
 import jwt from 'jsonwebtoken';
 export const auth = async (req, res, next) => {
@@ -32,7 +31,6 @@ export const authRole = (roles = []) => {
       }
       next();
     } catch (error) {
-      logger.error(`Unauthorized Error:${error.message}`);
       return errorResponse(res, 500, 'Internal server error.');
     }
   };

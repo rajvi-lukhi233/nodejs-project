@@ -3,7 +3,6 @@ import { STATUS } from '../utils/constant.js';
 import { findOrderById, updateById } from '../services/order.service.js';
 import { create, updatePayment, findPayment, paymentList } from '../services/payment.service.js';
 import { errorResponse, successResponse } from '../utils/resUtil.js';
-import { logger } from '../utils/logger.js';
 // import { findOne, updateUserById } from '../services/auth.service.js';
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -15,7 +14,6 @@ export const getPaymentList = async (req, res) => {
     }
     return successResponse(res, 200, 'payment list retrive successfully.', payment);
   } catch (error) {
-    logger.error(`PaymentList API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -58,7 +56,6 @@ export const createCheckoutPayment = async (req, res) => {
       paymentUrl: checkout.url,
     });
   } catch (error) {
-    logger.error(`Create payment API Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -106,18 +103,15 @@ export const webhook = async (req, res) => {
         orderStatus: STATUS.COMPLETED,
       });
       await updatePayment({ orderId: orderId }, { paymentStatus: STATUS.COMPLETED });
-      logger.info('Payment completed.');
       return successResponse(res, 200, 'Payment success.');
     }
     if (event.type == 'checkout.session.async_payment_failed') {
       // if (event.type === "payment_intent.payment_failed") {
       await updateById(orderId, { orderStatus: STATUS.FAILED });
       await updatePayment({ orderId: orderId }, { paymentStatus: STATUS.FAILED });
-      logger.error('Payment failed.');
       return errorResponse(res, 400, 'Payment faild');
     }
   } catch (error) {
-    logger.error(`Webhook Error:${error.message}`);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
