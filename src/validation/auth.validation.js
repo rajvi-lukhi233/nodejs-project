@@ -22,7 +22,7 @@ export const sendOtpSchemaValidation = joi.object({
 
 export const verifyOtpSchemaValidation = joi.object({
   email: joi.string().required(),
-  otp: joi.string().required(),
+  otp: joi.number().required(),
 });
 
 export const forgotPasswordSchemaValidation = joi.object({
