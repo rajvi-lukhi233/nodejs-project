@@ -3,6 +3,7 @@ import { successResponse, errorResponse } from '../utils/resUtil.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { get, redisDelete, set } from '../utils/redis.js';
 // import { sendMail } from '../utils/sendMail.js';
 // import { getVerifyEmailTemplate, getOtpEmailTemplate } from '../utils/emailBody.js';
 
@@ -109,10 +110,11 @@ export const sendOtp = async (req, res) => {
     if (!user) {
       return errorResponse(res, 404, 'This user is not found');
     }
-    await updateUserById(user.id, {
-      otpCode: otp,
-      otpExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
-    });
+    // await updateUserById(user.id, {
+    //   otpCode: otp,
+    //   otpExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
+    // });
+    await set(`otp:${user.id}`, otp, 60);
     // const emailBody = getOtpEmailTemplate(user.name, otp);
     // sendMail(email, "Forgot password OPT", emailBody);
     return successResponse(res, 200, 'OTP has been sent to your email address successfully.', {
@@ -131,15 +133,15 @@ export const verifyOtp = async (req, res) => {
     if (!user) {
       return errorResponse(res, 404, 'This user is not found');
     }
-    if (user.otpCode !== otp) {
+    const storedOtp = await get(`otp:${user.id}`);
+    if (!storedOtp) {
+      return errorResponse(res, 400, 'OTP has expired or not found. Please request a new one');
+    }
+    if (storedOtp !== otp) {
       return errorResponse(res, 400, 'Invalid OTP.');
     }
-    if (user.otpExpiredAt < new Date()) {
-      return errorResponse(res, 400, 'OTP has expired. Please request a new one');
-    }
+    await redisDelete(`otp:${user.id}`);
     await updateUserById(user.id, {
-      otp: null,
-      otpExpiredAt: null,
       resetPassToken,
       resetPassTokenExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
     });
