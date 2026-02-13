@@ -45,6 +45,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    twoFactorSecret: {
+      type: String,
+      default: null,
+    },
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false,
+    },
     deletedAt: {
       type: Date,
       default: null,

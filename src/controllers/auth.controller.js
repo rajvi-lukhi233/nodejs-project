@@ -1,6 +1,9 @@
 import { findOne, createUser, updateUserById, findAllUsers } from '../services/auth.service.js';
 import { successResponse, errorResponse } from '../utils/resUtil.js';
 import bcrypt from 'bcrypt';
+
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { get, redisDelete, set } from '../utils/redis.js';
@@ -183,6 +186,81 @@ export const getUserList = async (req, res) => {
     const users = await findAllUsers(limit, page);
     return successResponse(res, 200, 'Users list retrive successfully.', users);
   } catch (error) {
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+export const twoFactorSetup = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await findOne({ email });
+    if (!user) {
+      return errorResponse(res, 404, 'User not found.');
+    }
+    const secret = speakeasy.generateSecret({
+      length: 20,
+      name: 'TOTP-APP',
+    });
+
+    await updateUserById(user.id, { twoFactorSecret: secret.base32 });
+
+    const qr = await QRCode.toDataURL(secret.otpauth_url);
+
+    return successResponse(res, 200, 'TwoFactor successfully setup.', {
+      secret: secret.base32,
+      qrCode: qr,
+    });
+  } catch (error) {
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+export const twoFactorVerify = async (req, res) => {
+  try {
+    const { token, email } = req.body;
+
+    const user = await findOne({ email });
+    if (!user) {
+      return errorResponse(res, 404, 'User not found.');
+    }
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token,
+      window: 1,
+    });
+
+    if (!verified) return errorResponse(res, 400, 'Invalid code');
+
+    await updateUserById(user.id, { twoFactorEnabled: true });
+
+    return successResponse(res, 200, '2FA Enabled Successfully');
+  } catch (error) {
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+export const twoFactorLogin = async (req, res) => {
+  try {
+    const { email, token } = req.body;
+
+    const user = await findOne({ email });
+    if (!user) return errorResponse(res, 404, 'User not found');
+
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token,
+      window: 1,
+    });
+
+    if (!verified) return errorResponse(res, 400, 'Invalid 2FA Code');
+
+    const jwtToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_KEY);
+
+    return successResponse(res, 200, 'User login successfully.', { token: jwtToken });
+  } catch (error) {
+    console.log('Login error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
