@@ -2,11 +2,9 @@ import amqp from 'amqplib';
 import { sendMail } from '../utils/sendMail.js';
 import { getVerifyEmailTemplate } from '../utils/emailBody.js';
 
-let channel;
-
 export const startEmailWorker = async () => {
   const connection = await amqp.connect(process.env.RABBITMQ_URL);
-  channel = await connection.createChannel();
+  const channel = await connection.createChannel();
   await channel.assertQueue('send_verification_email', {
     durable: true,
   });
@@ -33,3 +31,30 @@ export const startEmailWorker = async () => {
 };
 
 startEmailWorker();
+
+//------------------------using bullmq----------------------------//
+
+// import { Worker } from 'bullmq';
+// import { connectRedis } from '../../config/redisConfig.js';
+
+// const worker = new Worker(
+//   'emailQueue',
+//   async (job) => {
+//     if (job.name === 'sendVerificationEmail') {
+//       const { name, email, verifyToken } = job.data;
+//       const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
+//       const emailBody = getVerifyEmailTemplate(name, verifyLink);
+//       await sendMail(email, 'Verify Your Email', emailBody);
+//       console.log('Email sent to:', email);
+//     }
+//   },
+//   { connection: connectRedis }
+// );
+
+// worker.on('completed', (job) => {
+//   console.log(`Job ${job.id} completed`);
+// });
+
+// worker.on('failed', (job, err) => {
+//   console.log(`Job failed:`, err);
+// });

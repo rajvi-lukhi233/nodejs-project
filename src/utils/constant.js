@@ -4,6 +4,7 @@ export const DB_NAME = {
   PRODUCT: 'products',
   PAYMENT: 'payments',
   MESSAGE: 'messages',
+  INVOICE: 'invoices',
 };
 export const ROLE = {
   ADMIN: 'admin',
