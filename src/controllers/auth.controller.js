@@ -8,7 +8,7 @@ import crypto from 'crypto';
 import { get, redisDelete, set } from '../utils/redis.js';
 import { PROVIDER } from '../utils/constant.js';
 import { getChannel } from '../../config/rabbitmqConfig.js';
-import { fail } from 'assert';
+// import { emailQueue } from '../queues/emailQueue.js';
 
 export const register = async (req, res) => {
   try {
@@ -45,6 +45,7 @@ export const register = async (req, res) => {
     channel.sendToQueue('send_verification_email', Buffer.from(JSON.stringify(message)), {
       persistent: true,
     });
+    // await emailQueue.add('sendVerificationEmail', { name, email, verifyToken });
     if (user) {
       return res.success(
         201,
@@ -95,7 +96,7 @@ export const login = async (req, res) => {
     }
     const comparePass = await bcrypt.compare(password, user.password);
     if (!comparePass) {
-      return fail(400, 'Incorrect password.');
+      return res.fail(400, 'Incorrect password.');
     }
     let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
       expiresIn: '24h',
