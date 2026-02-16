@@ -31,6 +31,7 @@ export const authRole = (roles = []) => {
       }
       next();
     } catch (error) {
+      console.log('AuthRole Error:', error);
       return errorResponse(res, 500, 'Internal server error.');
     }
   };

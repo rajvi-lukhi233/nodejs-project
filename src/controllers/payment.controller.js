@@ -14,6 +14,7 @@ export const getPaymentList = async (req, res) => {
     }
     return successResponse(res, 200, 'payment list retrive successfully.', payment);
   } catch (error) {
+    console.log('GetPaymentList API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -56,6 +57,7 @@ export const createCheckoutPayment = async (req, res) => {
       paymentUrl: checkout.url,
     });
   } catch (error) {
+    console.log('CreateCheckoutPayment API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -112,6 +114,7 @@ export const webhook = async (req, res) => {
       return errorResponse(res, 400, 'Payment faild');
     }
   } catch (error) {
+    console.log('Webhook API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };

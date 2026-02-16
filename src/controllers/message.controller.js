@@ -7,6 +7,7 @@ export const getMessageList = async (req, res) => {
     const list = await findAllMessage(userId);
     return successResponse(res, 200, 'List retrive successfully.', list);
   } catch (error) {
+    console.log('GetMessageList API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

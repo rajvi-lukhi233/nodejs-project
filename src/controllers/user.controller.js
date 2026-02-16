@@ -10,6 +10,7 @@ export const getUserProfile = async (req, res) => {
     }
     return successResponse(res, 200, 'User profile retrive successfully', user);
   } catch (error) {
+    console.log('GetUserProfile API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -30,6 +31,7 @@ export const updateUserProfile = async (req, res) => {
     }
     return errorResponse(res, 400, 'User profile not updated');
   } catch (error) {
+    console.log('UpdateUserProfile API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -44,6 +46,7 @@ export const deleteUserProfile = async (req, res) => {
     await updateUserById(userId, { deletedAt: Date.now() });
     return successResponse(res, 200, 'User deleted successfully.');
   } catch (error) {
+    console.log('DeleteUserProfile API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

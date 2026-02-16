@@ -59,6 +59,7 @@ export const register = async (req, res) => {
     }
     return errorResponse(res, 400, 'User not registered');
   } catch (error) {
+    console.log('Register API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -76,6 +77,7 @@ export const verifyEmail = async (req, res) => {
     });
     return successResponse(res, 200, 'Email verified successfully.');
   } catch (error) {
+    console.log('verifyEmail API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -113,6 +115,7 @@ export const login = async (req, res) => {
     };
     return successResponse(res, 200, 'User login successfully.', userResponse);
   } catch (error) {
+    console.log('Login API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -136,6 +139,7 @@ export const sendOtp = async (req, res) => {
       otp,
     });
   } catch (error) {
+    console.log('SendOTP API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -164,6 +168,7 @@ export const verifyOtp = async (req, res) => {
       token: resetPassToken,
     });
   } catch (error) {
+    console.log('verifyOTP API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -187,6 +192,7 @@ export const forgotPassword = async (req, res) => {
 
     return successResponse(res, 200, 'Password reset successfully.');
   } catch (error) {
+    console.log('ForgotPassword API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -198,6 +204,7 @@ export const getUserList = async (req, res) => {
     const users = await findAllUsers(limit, page);
     return successResponse(res, 200, 'Users list retrive successfully.', users);
   } catch (error) {
+    console.log('getUserList API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -223,6 +230,7 @@ export const twoFactorSetup = async (req, res) => {
       qrCode: qr,
     });
   } catch (error) {
+    console.log('TwoFactorSetup API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -248,6 +256,7 @@ export const twoFactorVerify = async (req, res) => {
 
     return successResponse(res, 200, '2FA Enabled Successfully');
   } catch (error) {
+    console.log('TwoFactorVerify API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -272,7 +281,7 @@ export const twoFactorLogin = async (req, res) => {
 
     return successResponse(res, 200, 'User login successfully.', { token: jwtToken });
   } catch (error) {
-    console.log('Login error:', error);
+    console.log('TwoFactorLogin API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -281,6 +290,7 @@ export const loginWithGoogleLink = async (req, res) => {
   try {
     return res.send('<a href="auth/google">Login with Google</a>');
   } catch (error) {
+    console.log('loginWithGoogleLink API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };
@@ -294,6 +304,7 @@ export const loginWithGoogle = async (req, res) => {
     //redirect to success frontend page
     return successResponse(res, 200, 'Login with google successfully.', { token });
   } catch (error) {
+    console.log('LoginWithGoogle API Error:', error);
     return errorResponse(res, 500, 'Internal server error');
   }
 };

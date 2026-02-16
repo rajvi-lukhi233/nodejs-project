@@ -15,6 +15,7 @@ export const getAllProducts = async (req, res) => {
     const products = await findAll({}, limit, page);
     return successResponse(res, 200, 'Product list retrive successfully.', products);
   } catch (error) {
+    console.log('GetAllProducts API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -36,6 +37,7 @@ export const addProduct = async (req, res) => {
     }
     return errorResponse(res, 400, 'Product not added.');
   } catch (error) {
+    console.log('AddProduct API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -67,6 +69,7 @@ export const updateProduct = async (req, res) => {
     });
     return successResponse(res, 200, 'Prouct details updated successfully.', updatedProduct);
   } catch (error) {
+    console.log('UpdateProduct API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -81,6 +84,7 @@ export const deleteProduct = async (req, res) => {
     await deleteById(productId);
     return successResponse(res, 200, 'Product deleted successfully.');
   } catch (error) {
+    console.log('DeleteProduct API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };

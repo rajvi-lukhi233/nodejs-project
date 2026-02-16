@@ -15,6 +15,7 @@ export const getAllOrders = async (req, res) => {
     const orders = await findAllOrders(userId, role);
     return successResponse(res, 200, 'Orders list retrive successfully.', orders);
   } catch (error) {
+    console.log('getAllOrders API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -42,6 +43,7 @@ export const craeteOrder = async (req, res) => {
     }
     return errorResponse(res, 400, 'Order not created.');
   } catch (error) {
+    console.log('craeteOrder API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -76,6 +78,7 @@ export const updateOrder = async (req, res) => {
     }
     return errorResponse(res, 400, 'Order not updated.');
   } catch (error) {
+    console.log('updateOrder API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -90,6 +93,7 @@ export const deleteOrder = async (req, res) => {
     await deleteById(orderId);
     return successResponse(res, 200, 'Order deleted successfully.');
   } catch (error) {
+    console.log('GetMessageList API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
@@ -102,6 +106,7 @@ export const getUserWiseOrder = async (req, res) => {
     }
     return successResponse(res, 200, 'Order list retrive successfully.', orders);
   } catch (error) {
+    console.log('getUserWiseOrder API Error:', error);
     return errorResponse(res, 500, 'Internal server error.');
   }
 };
