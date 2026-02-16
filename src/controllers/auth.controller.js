@@ -7,8 +7,8 @@ import QRCode from 'qrcode';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { get, redisDelete, set } from '../utils/redis.js';
-// import { sendMail } from '../utils/sendMail.js';
-// import { getVerifyEmailTemplate, getOtpEmailTemplate } from '../utils/emailBody.js';
+import { PROVIDER } from '../utils/constant.js';
+import { getChannel } from '../../config/rabbitmqConfig.js';
 
 export const register = async (req, res) => {
   try {
@@ -32,17 +32,24 @@ export const register = async (req, res) => {
       password: bcryptedPass,
       role,
       emailVerifyToken: verifyToken,
+      provider: PROVIDER.LOCAL,
     });
     //3. generate jwt token
     let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
       expiresIn: '24h',
     });
     user._doc.token = token;
+
+    const channel = getChannel();
+    const message = {
+      name,
+      email,
+      verifyToken,
+    };
+    channel.sendToQueue('send_verification_email', Buffer.from(JSON.stringify(message)), {
+      persistent: true,
+    });
     if (user) {
-      //4.send vuser verification link
-      // const verifyLink = `${process.env.BASE_URL}/api/auth/verifyEmail/${verifyToken}`;
-      // const emailBody = getVerifyEmailTemplate(name, verifyLink);
-      // sendMail(email, "Verify Your Email", emailBody);
       return successResponse(
         res,
         200,
@@ -81,6 +88,11 @@ export const login = async (req, res) => {
     if (!user) {
       return errorResponse(res, 404, 'User is not registered with this email.');
     }
+
+    if (user.provider !== PROVIDER.LOCAL) {
+      return errorResponse(res, 400, 'Please login with google.');
+    }
+
     if (!user.isVerified) {
       return errorResponse(res, 400, 'Please verify your email.');
     }
@@ -181,8 +193,8 @@ export const forgotPassword = async (req, res) => {
 
 export const getUserList = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit);
-    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
     const users = await findAllUsers(limit, page);
     return successResponse(res, 200, 'Users list retrive successfully.', users);
   } catch (error) {
@@ -261,6 +273,27 @@ export const twoFactorLogin = async (req, res) => {
     return successResponse(res, 200, 'User login successfully.', { token: jwtToken });
   } catch (error) {
     console.log('Login error:', error);
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+export const loginWithGoogleLink = async (req, res) => {
+  try {
+    return res.send('<a href="auth/google">Login with Google</a>');
+  } catch (error) {
+    return errorResponse(res, 500, 'Internal server error');
+  }
+};
+
+export const loginWithGoogle = async (req, res) => {
+  try {
+    const user = req.user;
+    let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
+      expiresIn: '24h',
+    });
+    //redirect to success frontend page
+    return successResponse(res, 200, 'Login with google successfully.', { token });
+  } catch (error) {
     return errorResponse(res, 500, 'Internal server error');
   }
 };

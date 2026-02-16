@@ -7,6 +7,8 @@ import perfLogx from 'perf-logx';
 import { connectdb } from '../config/dbConfig.js';
 import { fileURLToPath } from 'url';
 import { client, connectRedis } from '../config/redisConfig.js';
+import '../config/passportConfig.js';
+import passport from 'passport';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,11 +16,14 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(perfLogx());
 
+app.use(passport.initialize());
+
 const port = process.env.PORT;
 import http from 'http';
 import { initSocket } from './utils/socket.js';
 import { errorResponse, successResponse } from './utils/resUtil.js';
 import mongoose from 'mongoose';
+import { connectRabbitMQ } from '../config/rabbitmqConfig.js';
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
@@ -29,6 +34,7 @@ const io = new Server(server, {
 
 connectdb();
 connectRedis();
+connectRabbitMQ();
 
 app.get('/health', async (req, res) => {
   try {

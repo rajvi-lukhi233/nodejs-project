@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DB_NAME, ROLE } from '../utils/constant.js';
+import { DB_NAME, PROVIDER, ROLE } from '../utils/constant.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -52,6 +52,15 @@ const userSchema = new mongoose.Schema(
     twoFactorEnabled: {
       type: Boolean,
       default: false,
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    provider: {
+      type: String,
+      enum: Object.values(PROVIDER),
+      required: true,
     },
     deletedAt: {
       type: Date,

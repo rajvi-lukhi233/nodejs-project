@@ -14,3 +14,7 @@ export const STATUS = {
   COMPLETED: 'completed',
   FAILED: 'failed',
 };
+export const PROVIDER = {
+  GOOGLE: 'google',
+  LOCAL: 'local',
+};
