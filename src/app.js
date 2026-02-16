@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { client, connectRedis } from '../config/redisConfig.js';
 import '../config/passportConfig.js';
 import passport from 'passport';
+import { createResponseHandler } from 'smart-response';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,7 +22,6 @@ app.use(passport.initialize());
 const port = process.env.PORT;
 import http from 'http';
 import { initSocket } from './utils/socket.js';
-import { errorResponse, successResponse } from './utils/resUtil.js';
 import mongoose from 'mongoose';
 import { connectRabbitMQ } from '../config/rabbitmqConfig.js';
 const server = http.createServer(app);
@@ -42,18 +42,18 @@ app.get('/health', async (req, res) => {
     const mongoConnected = mongoose.connection.readyState === 1;
 
     if (!redisConnected || !mongoConnected) {
-      return errorResponse(res, 500, 'unhealthy.', {
+      return res.fail(500, 'unhealthy.', {
         status: 'ERROR',
         redis: 'disconnected',
       });
     }
-    return successResponse(res, 200, 'healthy.', {
+    return res.success(200, 'healthy.', {
       status: 'OK',
       redis: 'connected',
       uptime: process.uptime(),
     });
   } catch (error) {
-    return errorResponse(res, 500, 'Interal server error.', {
+    return res.fail(500, 'Interal server error.', {
       error: error.message,
     });
   }
@@ -71,6 +71,7 @@ const limiter = rateLimit({
 });
 initSocket(io);
 app.use(express.json());
+app.use(createResponseHandler());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(limiter);
 app.use('/api', indexRoute);

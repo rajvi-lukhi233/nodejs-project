@@ -7,16 +7,15 @@ import {
   findAll,
   findProductById,
 } from '../services/product.service.js';
-import { successResponse, errorResponse } from '../utils/resUtil.js';
 
 export const getAllProducts = async (req, res) => {
   try {
     const { limit, page } = req.query;
     const products = await findAll({}, limit, page);
-    return successResponse(res, 200, 'Product list retrive successfully.', products);
+    return res.success(200, 'Product list retrive successfully.', products);
   } catch (error) {
     console.log('GetAllProducts API Error:', error);
-    return errorResponse(res, 500, 'Internal server error.');
+    return res.fail(500, 'Internal server error.');
   }
 };
 
@@ -33,12 +32,12 @@ export const addProduct = async (req, res) => {
       category,
     });
     if (product) {
-      return successResponse(res, 201, 'Product added successfully.', product);
+      return res.success(201, 'Product added successfully.', product);
     }
-    return errorResponse(res, 400, 'Product not added.');
+    return res.fail(400, 'Product not added.');
   } catch (error) {
     console.log('AddProduct API Error:', error);
-    return errorResponse(res, 500, 'Internal server error.');
+    return res.fail(500, 'Internal server error.');
   }
 };
 
@@ -49,7 +48,7 @@ export const updateProduct = async (req, res) => {
     const newImage = req.file?.filename;
     const product = await findProductById(productId, { id: 1, image: 1 });
     if (!product) {
-      return errorResponse(res, 404, 'Product not found.');
+      return res.fail(404, 'Product not found.');
     }
     if (newImage && product.image) {
       const oldImagePath = path.join(__dirname, '../public', product.image);
@@ -67,10 +66,10 @@ export const updateProduct = async (req, res) => {
       category,
       image: newImage,
     });
-    return successResponse(res, 200, 'Prouct details updated successfully.', updatedProduct);
+    return res.success(200, 'Prouct details updated successfully.', updatedProduct);
   } catch (error) {
     console.log('UpdateProduct API Error:', error);
-    return errorResponse(res, 500, 'Internal server error.');
+    return res.fail(500, 'Internal server error.');
   }
 };
 
@@ -79,12 +78,12 @@ export const deleteProduct = async (req, res) => {
     const { productId } = req.params;
     const product = await findProductById(productId, { id: 1 });
     if (!product) {
-      return errorResponse(res, 404, 'Product not found.');
+      return res.fail(404, 'Product not found.');
     }
     await deleteById(productId);
-    return successResponse(res, 200, 'Product deleted successfully.');
+    return res.success(200, 'Product deleted successfully.');
   } catch (error) {
     console.log('DeleteProduct API Error:', error);
-    return errorResponse(res, 500, 'Internal server error.');
+    return res.fail(500, 'Internal server error.');
   }
 };

@@ -1,4 +1,4 @@
-import { errorResponse } from '../utils/resUtil.js';
+
 
 export const validation = (schema) => {
   return (req, res, next) => {
@@ -9,12 +9,12 @@ export const validation = (schema) => {
         ...req.query,
       });
       if (error) {
-        return errorResponse(res, 400, error.details[0].message);
+        return res.fail(400, error.details[0].message);
       }
       next();
     } catch (error) {
       console.log('Validation Error:', error);
-      return errorResponse(res, 500, 'Internal server error during validation');
+      return res.fail(500, 'Internal server error during validation');
     }
   };
 };

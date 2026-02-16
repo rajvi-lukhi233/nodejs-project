@@ -1,5 +1,4 @@
 import { findOne, createUser, updateUserById, findAllUsers } from '../services/auth.service.js';
-import { successResponse, errorResponse } from '../utils/resUtil.js';
 import bcrypt from 'bcrypt';
 
 import speakeasy from 'speakeasy';
@@ -9,6 +8,7 @@ import crypto from 'crypto';
 import { get, redisDelete, set } from '../utils/redis.js';
 import { PROVIDER } from '../utils/constant.js';
 import { getChannel } from '../../config/rabbitmqConfig.js';
+import { fail } from 'assert';
 
 export const register = async (req, res) => {
   try {
@@ -16,11 +16,7 @@ export const register = async (req, res) => {
     //1. checking is existinvg user
     const existUser = await findOne({ email }, { id: 1 });
     if (existUser) {
-      return errorResponse(
-        res,
-        400,
-        'User already registered with this email.Please use other email.'
-      );
+      return res.fail(400, 'User already registered with this email.Please use other email.');
     }
     const verifyToken = crypto.randomBytes(32).toString('hex');
     const bcryptedPass = await bcrypt.hash(password, 10);
@@ -50,17 +46,16 @@ export const register = async (req, res) => {
       persistent: true,
     });
     if (user) {
-      return successResponse(
-        res,
-        200,
+      return res.success(
+        201,
         'User registered successfully.Please go to your email and verify your account',
         user
       );
     }
-    return errorResponse(res, 400, 'User not registered');
+    return res.fail(400, 'User not registered');
   } catch (error) {
     console.log('Register API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -69,16 +64,16 @@ export const verifyEmail = async (req, res) => {
     const { token } = req.params;
     const user = await findOne({ emailVerifyToken: token }, { id: 1 });
     if (!user) {
-      return errorResponse(res, 400, 'Invalid emailverification token.');
+      return res.fail(400, 'Invalid emailverification token.');
     }
     await updateUserById(user._id, {
       isVerified: true,
       emailVerifyToken: null,
     });
-    return successResponse(res, 200, 'Email verified successfully.');
+    return res.success(200, 'Email verified successfully.');
   } catch (error) {
     console.log('verifyEmail API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(res, 500, 'Internal server error');
   }
 };
 
@@ -88,19 +83,19 @@ export const login = async (req, res) => {
     let user = await findOne({ email });
 
     if (!user) {
-      return errorResponse(res, 404, 'User is not registered with this email.');
+      return res.fail(404, 'User is not registered with this email.');
     }
 
-    if (user.provider !== PROVIDER.LOCAL) {
-      return errorResponse(res, 400, 'Please login with google.');
-    }
+    // if (user.provider !== PROVIDER.LOCAL) {
+    //   return res.fail(400, 'Please login with google.');
+    // }
 
     if (!user.isVerified) {
-      return errorResponse(res, 400, 'Please verify your email.');
+      return res.fail(400, 'Please verify your email.');
     }
     const comparePass = await bcrypt.compare(password, user.password);
     if (!comparePass) {
-      return errorResponse(res, 400, 'Incorrect password.');
+      return fail(400, 'Incorrect password.');
     }
     let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
       expiresIn: '24h',
@@ -113,10 +108,10 @@ export const login = async (req, res) => {
       role: user.role,
       token,
     };
-    return successResponse(res, 200, 'User login successfully.', userResponse);
+    return res.success(200, 'User login successfully.', userResponse);
   } catch (error) {
     console.log('Login API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -126,7 +121,7 @@ export const sendOtp = async (req, res) => {
     const user = await findOne({ email });
     const otp = Math.floor(100000 + Math.random() * 900000);
     if (!user) {
-      return errorResponse(res, 404, 'This user is not found');
+      return res.fail(404, 'This user is not found');
     }
     // await updateUserById(user.id, {
     //   otpCode: otp,
@@ -135,12 +130,12 @@ export const sendOtp = async (req, res) => {
     await set(`otp:${user.id}`, otp, 60);
     // const emailBody = getOtpEmailTemplate(user.name, otp);
     // sendMail(email, "Forgot password OPT", emailBody);
-    return successResponse(res, 200, 'OTP has been sent to your email address successfully.', {
+    return res.success(200, 'OTP has been sent to your email address successfully.', {
       otp,
     });
   } catch (error) {
     console.log('SendOTP API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -150,26 +145,26 @@ export const verifyOtp = async (req, res) => {
     const resetPassToken = crypto.randomBytes(32).toString('hex');
     const user = await findOne({ email });
     if (!user) {
-      return errorResponse(res, 404, 'This user is not found');
+      return res.fail(404, 'This user is not found');
     }
     const storedOtp = await get(`otp:${user.id}`);
     if (!storedOtp) {
-      return errorResponse(res, 400, 'OTP has expired or not found. Please request a new one');
+      return res.fail(400, 'OTP has expired or not found. Please request a new one');
     }
     if (storedOtp !== otp) {
-      return errorResponse(res, 400, 'Invalid OTP.');
+      return res.fail(400, 'Invalid OTP.');
     }
     await redisDelete(`otp:${user.id}`);
     await updateUserById(user.id, {
       resetPassToken,
       resetPassTokenExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
     });
-    return successResponse(res, 200, 'OTP verified successfully.', {
+    return res.success(200, 'OTP verified successfully.', {
       token: resetPassToken,
     });
   } catch (error) {
     console.log('verifyOTP API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -178,10 +173,10 @@ export const forgotPassword = async (req, res) => {
     const { newPassword, token } = req.body;
     const user = await findOne({ resetPassToken: token });
     if (!user) {
-      return errorResponse(res, 400, 'Invalid Reset passwordn');
+      return res.fail(400, 'Invalid Reset passwordn');
     }
     if (user.resetPassTokenExpiredAt < new Date()) {
-      return errorResponse(res, 400, 'Reset password token has expired.');
+      return res.fail(400, 'Reset password token has expired.');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await updateUserById(user.id, {
@@ -190,10 +185,10 @@ export const forgotPassword = async (req, res) => {
       password: hashedPassword,
     });
 
-    return successResponse(res, 200, 'Password reset successfully.');
+    return res.success(200, 'Password reset successfully.');
   } catch (error) {
     console.log('ForgotPassword API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -202,10 +197,10 @@ export const getUserList = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 1;
     const users = await findAllUsers(limit, page);
-    return successResponse(res, 200, 'Users list retrive successfully.', users);
+    return res.success(200, 'Users list retrive successfully.', users);
   } catch (error) {
     console.log('getUserList API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -214,7 +209,7 @@ export const twoFactorSetup = async (req, res) => {
     const { email } = req.body;
     const user = await findOne({ email });
     if (!user) {
-      return errorResponse(res, 404, 'User not found.');
+      return res.fail(404, 'User not found.');
     }
     const secret = speakeasy.generateSecret({
       length: 20,
@@ -225,13 +220,13 @@ export const twoFactorSetup = async (req, res) => {
 
     const qr = await QRCode.toDataURL(secret.otpauth_url);
 
-    return successResponse(res, 200, 'TwoFactor successfully setup.', {
+    return res.success(200, 'TwoFactor successfully setup.', {
       secret: secret.base32,
       qrCode: qr,
     });
   } catch (error) {
     console.log('TwoFactorSetup API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -241,7 +236,7 @@ export const twoFactorVerify = async (req, res) => {
 
     const user = await findOne({ email });
     if (!user) {
-      return errorResponse(res, 404, 'User not found.');
+      return res.fail(404, 'User not found.');
     }
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
@@ -250,14 +245,14 @@ export const twoFactorVerify = async (req, res) => {
       window: 1,
     });
 
-    if (!verified) return errorResponse(res, 400, 'Invalid code');
+    if (!verified) return res.fail(400, 'Invalid code');
 
     await updateUserById(user.id, { twoFactorEnabled: true });
 
-    return successResponse(res, 200, '2FA Enabled Successfully');
+    return res.success(200, '2FA Enabled Successfully');
   } catch (error) {
     console.log('TwoFactorVerify API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -266,7 +261,7 @@ export const twoFactorLogin = async (req, res) => {
     const { email, token } = req.body;
 
     const user = await findOne({ email });
-    if (!user) return errorResponse(res, 404, 'User not found');
+    if (!user) return res.fail(404, 'User not found');
 
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
@@ -275,14 +270,14 @@ export const twoFactorLogin = async (req, res) => {
       window: 1,
     });
 
-    if (!verified) return errorResponse(res, 400, 'Invalid 2FA Code');
+    if (!verified) return res.fail(400, 'Invalid 2FA Code');
 
     const jwtToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_KEY);
 
-    return successResponse(res, 200, 'User login successfully.', { token: jwtToken });
+    return res.success(200, 'User login successfully.', { token: jwtToken });
   } catch (error) {
     console.log('TwoFactorLogin API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -291,7 +286,7 @@ export const loginWithGoogleLink = async (req, res) => {
     return res.send('<a href="auth/google">Login with Google</a>');
   } catch (error) {
     console.log('loginWithGoogleLink API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
 
@@ -302,9 +297,9 @@ export const loginWithGoogle = async (req, res) => {
       expiresIn: '24h',
     });
     //redirect to success frontend page
-    return successResponse(res, 200, 'Login with google successfully.', { token });
+    return res.success(200, 'Login with google successfully.', { token });
   } catch (error) {
     console.log('LoginWithGoogle API Error:', error);
-    return errorResponse(res, 500, 'Internal server error');
+    return res.fail(500, 'Internal server error');
   }
 };
