@@ -1,6 +1,6 @@
 import express from 'express';
 import { auth } from '../middleware/authMiddleware.js';
-import { downloadInvoice, generateInvoice } from '../controllers/invoiceController.js';
+import { downloadInvoice, generateInvoice } from '../controllers/invoice.Controller.js';
 const route = express.Router();
 
 route.post('/generateInvoice', auth, generateInvoice);
