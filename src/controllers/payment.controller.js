@@ -23,9 +23,11 @@ export const createCheckoutPayment = async (req, res) => {
     const { orderId } = req.body;
     const order = await findOrderById(orderId);
     const { userId } = req.user;
+    //1. checking is existing order
     if (!order) {
       return res.fail(400, 'Order not found');
     }
+    //2. checking is payment already done or not
     const payment = await findPayment(
       { orderId: orderId, paymentStatus: STATUS.COMPLETED },
       { id: 1 }
@@ -43,6 +45,8 @@ export const createCheckoutPayment = async (req, res) => {
       },
       quantity: item.quantity,
     }));
+
+    //3. create checout session for payment
     const checkout = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items,
@@ -51,6 +55,8 @@ export const createCheckoutPayment = async (req, res) => {
       cancel_url: `${process.env.BASE_URL}/cancel`,
       metadata: { orderId: order._id.toString(), userId: userId.toString() },
     });
+
+    //4. create payment
     await create({ userId, orderId, amount: order.totalAmount });
     return res.success(200, 'Payment created successfully.', {
       paymentUrl: checkout.url,

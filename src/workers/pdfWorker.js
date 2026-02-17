@@ -12,6 +12,7 @@ const invoiceFolder = path.join(__dirname, '../public/invoice');
 if (!fs.existsSync(invoiceFolder)) {
   fs.mkdirSync(invoiceFolder, { recursive: true });
 }
+//also use "Puppeteer" package for generate pdf to bind html,css
 
 const worker = new Worker(
   'pdfQueue',

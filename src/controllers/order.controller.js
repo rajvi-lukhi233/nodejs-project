@@ -54,6 +54,7 @@ export const updateOrder = async (req, res) => {
     const { userId } = req.user;
     let totalAmount = 0;
     const order = await findOrderById(orderId);
+    //1. checking is existing order
     if (!order) {
       return res.fail(404, 'Order not found.');
     }
@@ -86,9 +87,11 @@ export const deleteOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const order = await findOrderById(orderId, { id: 1 });
+    //1. checking is existing order
     if (!order) {
       return res.fail(404, 'Order not found.');
     }
+    //2. delete order
     await deleteById(orderId);
     return res.success(200, 'Order deleted successfully.');
   } catch (error) {

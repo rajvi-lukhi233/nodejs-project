@@ -13,7 +13,7 @@ import { getChannel } from '../../config/rabbitmqConfig.js';
 export const register = async (req, res) => {
   try {
     let { name, email, password, role } = req.body;
-    //1. checking is existinvg user
+    //1. checking is existing user
     const existUser = await findOne({ email }, { id: 1 });
     if (existUser) {
       return res.fail(400, 'User already registered with this email.Please use other email.');
@@ -35,8 +35,9 @@ export const register = async (req, res) => {
       expiresIn: '24h',
     });
     user._doc.token = token;
-
+    //4. use rabbitMQ for sending verification email
     const channel = getChannel();
+
     const message = {
       name,
       email,
@@ -64,9 +65,11 @@ export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
     const user = await findOne({ emailVerifyToken: token }, { id: 1 });
+    //1. checking is existing user
     if (!user) {
       return res.fail(400, 'Invalid emailverification token.');
     }
+    //2. update isVerified field of user table
     await updateUserById(user._id, {
       isVerified: true,
       emailVerifyToken: null,
@@ -82,22 +85,24 @@ export const login = async (req, res) => {
   try {
     let { email, password } = req.body;
     let user = await findOne({ email });
-
+    //1. checking is existing user
     if (!user) {
       return res.fail(404, 'User is not registered with this email.');
     }
-
-    // if (user.provider !== PROVIDER.LOCAL) {
-    //   return res.fail(400, 'Please login with google.');
-    // }
-
+    //2. checking is user google login or normal
+    if (user.provider !== PROVIDER.LOCAL) {
+      return res.fail(400, 'Please login with google.');
+    }
+    //3. checking is user verified
     if (!user.isVerified) {
       return res.fail(400, 'Please verify your email.');
     }
+    //4. compare password
     const comparePass = await bcrypt.compare(password, user.password);
     if (!comparePass) {
       return res.fail(400, 'Incorrect password.');
     }
+    //5. generate jwt token
     let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
       expiresIn: '24h',
     });
@@ -121,6 +126,7 @@ export const sendOtp = async (req, res) => {
     const { email } = req.body;
     const user = await findOne({ email });
     const otp = Math.floor(100000 + Math.random() * 900000);
+    //1. checking is existing user
     if (!user) {
       return res.fail(404, 'This user is not found');
     }
@@ -128,6 +134,8 @@ export const sendOtp = async (req, res) => {
     //   otpCode: otp,
     //   otpExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
     // });
+
+    //2. store otp in redis
     await set(`otp:${user.id}`, otp, 60);
     // const emailBody = getOtpEmailTemplate(user.name, otp);
     // sendMail(email, "Forgot password OPT", emailBody);
@@ -145,17 +153,23 @@ export const verifyOtp = async (req, res) => {
     const { otp, email } = req.body;
     const resetPassToken = crypto.randomBytes(32).toString('hex');
     const user = await findOne({ email });
+    //1. checking is existing user
     if (!user) {
       return res.fail(404, 'This user is not found');
     }
     const storedOtp = await get(`otp:${user.id}`);
+    //2. checking is OTP is expired or exist
     if (!storedOtp) {
       return res.fail(400, 'OTP has expired or not found. Please request a new one');
     }
+    //3. checking is correct OTP
     if (storedOtp !== otp) {
       return res.fail(400, 'Invalid OTP.');
     }
+    //4. delete OTP in redis
     await redisDelete(`otp:${user.id}`);
+
+    //5. update user table
     await updateUserById(user.id, {
       resetPassToken,
       resetPassTokenExpiredAt: new Date(Date.now() + 10 * 60 * 1000),
@@ -173,13 +187,16 @@ export const forgotPassword = async (req, res) => {
   try {
     const { newPassword, token } = req.body;
     const user = await findOne({ resetPassToken: token });
+    //1. checking is existing user
     if (!user) {
       return res.fail(400, 'Invalid Reset passwordn');
     }
+    //2. checking is resetPasswordToken expire
     if (user.resetPassTokenExpiredAt < new Date()) {
       return res.fail(400, 'Reset password token has expired.');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+    //3. update user password
     await updateUserById(user.id, {
       resetPassToken: null,
       resetPassTokenExpiredAt: null,
@@ -209,6 +226,7 @@ export const twoFactorSetup = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await findOne({ email });
+    //1. checking is existing user
     if (!user) {
       return res.fail(404, 'User not found.');
     }
@@ -216,9 +234,10 @@ export const twoFactorSetup = async (req, res) => {
       length: 20,
       name: 'TOTP-APP',
     });
-
+    //2. store secret to user table
     await updateUserById(user.id, { twoFactorSecret: secret.base32 });
 
+    //3. create qr code
     const qr = await QRCode.toDataURL(secret.otpauth_url);
 
     return res.success(200, 'TwoFactor successfully setup.', {
@@ -236,9 +255,11 @@ export const twoFactorVerify = async (req, res) => {
     const { token, email } = req.body;
 
     const user = await findOne({ email });
+    //1. checking is existing user
     if (!user) {
       return res.fail(404, 'User not found.');
     }
+    //2. verify 2FA
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
       encoding: 'base32',
@@ -248,6 +269,7 @@ export const twoFactorVerify = async (req, res) => {
 
     if (!verified) return res.fail(400, 'Invalid code');
 
+    //1. update user
     await updateUserById(user.id, { twoFactorEnabled: true });
 
     return res.success(200, '2FA Enabled Successfully');

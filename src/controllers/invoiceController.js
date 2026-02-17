@@ -5,6 +5,7 @@ export const generateInvoice = async (req, res) => {
   try {
     const { orderId } = req.body;
     const { userId } = req.user;
+    //1. create job using bullMQ for generate invoice
     await pdfQueue.add(
       'generateInvoice',
       { orderId, userId },
@@ -16,6 +17,7 @@ export const generateInvoice = async (req, res) => {
         },
       }
     );
+    //2. store invoice in DB
     await createInvoice({
       orderId,
       userId,
@@ -30,7 +32,8 @@ export const generateInvoice = async (req, res) => {
 export const downloadInvoice = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const invoice = await findInvoice(orderId, { pdf: 1, _id: 1 });
+    const invoice = await findInvoice(orderId);
+    //1. checking is existing invoice
     if (!invoice) {
       return res.fail(404, 'Invoice not found.');
     }
