@@ -1,4 +1,10 @@
-import { findOne, createUser, updateUserById, findAllUsers } from '../services/auth.service.js';
+import {
+  findOne,
+  createUser,
+  updateUserById,
+  findAllUsers,
+  findUserById,
+} from '../services/auth.service.js';
 import bcrypt from 'bcrypt';
 
 import speakeasy from 'speakeasy';
@@ -101,6 +107,12 @@ export const login = async (req, res) => {
     const comparePass = await bcrypt.compare(password, user.password);
     if (!comparePass) {
       return res.fail(400, 'Incorrect password.');
+    }
+    if (user.twoFactorEnabled) {
+      return res.success(200, '2FA required', {
+        require2FA: true,
+        userId: user._id,
+      });
     }
     //5. generate jwt token
     let token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_KEY, {
@@ -224,8 +236,8 @@ export const getUserList = async (req, res) => {
 
 export const twoFactorSetup = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = await findOne({ email });
+    const { userId } = req.user;
+    const user = await findUserById(userId, { _id: 1 });
     //1. checking is existing user
     if (!user) {
       return res.fail(404, 'User not found.');
@@ -252,9 +264,10 @@ export const twoFactorSetup = async (req, res) => {
 
 export const twoFactorVerify = async (req, res) => {
   try {
-    const { token, email } = req.body;
+    const { otp } = req.body;
+    const { userId } = req.user;
 
-    const user = await findOne({ email });
+    const user = await findUserById(userId, { _id: 1, twoFactorSecret: 1 });
     //1. checking is existing user
     if (!user) {
       return res.fail(404, 'User not found.');
@@ -263,7 +276,7 @@ export const twoFactorVerify = async (req, res) => {
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
       encoding: 'base32',
-      token,
+      token: otp,
       window: 1,
     });
 
@@ -281,23 +294,30 @@ export const twoFactorVerify = async (req, res) => {
 
 export const twoFactorLogin = async (req, res) => {
   try {
-    const { email, token } = req.body;
+    const { userId, otp } = req.body;
 
-    const user = await findOne({ email });
+    const user = await findUserById(userId);
     if (!user) return res.fail(404, 'User not found');
 
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
       encoding: 'base32',
-      token,
+      token: otp,
       window: 1,
     });
 
     if (!verified) return res.fail(400, 'Invalid 2FA Code');
 
-    const jwtToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_KEY);
-
-    return res.success(200, 'User login successfully.', { token: jwtToken });
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_KEY);
+    user._doc.token = token;
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token,
+    };
+    return res.success(200, 'User login successfully.', { token: userResponse });
   } catch (error) {
     console.log('TwoFactorLogin API Error:', error);
     return res.fail(500, 'Internal server error');
