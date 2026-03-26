@@ -10,6 +10,10 @@ import { client, connectRedis } from '../config/redisConfig.js';
 import '../config/passportConfig.js';
 import passport from 'passport';
 import { createResponseHandler } from 'smart-response';
+import http from 'http';
+import { initSocket } from './utils/socket.js';
+import mongoose from 'mongoose';
+import { connectRabbitMQ } from '../config/rabbitmqConfig.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,10 +24,7 @@ app.use(perfLogx());
 app.use(passport.initialize());
 
 const port = process.env.PORT;
-import http from 'http';
-import { initSocket } from './utils/socket.js';
-import mongoose from 'mongoose';
-import { connectRabbitMQ } from '../config/rabbitmqConfig.js';
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {

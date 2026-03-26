@@ -124,6 +124,7 @@ export const login = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      twoFactorEnabled: user.twoFactorEnabled,
       token,
     };
     return res.success(200, 'User login successfully.', userResponse);
@@ -315,6 +316,7 @@ export const twoFactorLogin = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      twoFactorEnabled: user.twoFactorEnabled,
       token,
     };
     return res.success(200, 'User login successfully.', { token: userResponse });
