@@ -5,6 +5,7 @@ export const DB_NAME = {
   PAYMENT: 'payments',
   MESSAGE: 'messages',
   INVOICE: 'invoices',
+  COUPON: 'coupons',
 };
 export const ROLE = {
   ADMIN: 'admin',
@@ -18,4 +19,14 @@ export const STATUS = {
 export const PROVIDER = {
   GOOGLE: 'google',
   LOCAL: 'local',
+};
+
+export const PLAN = {
+  MONTHLY: 'monthly',
+  YEARLY: 'yearly',
+};
+
+export const PLAN_STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
 };

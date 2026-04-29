@@ -7,6 +7,8 @@ import orderRoute from './order.route.js';
 import paymentRoute from './payment.route.js';
 import messageRoute from './message.route.js';
 import invoiceGenerateRoute from './invoice.route.js';
+import couponRoute from './coupon.route.js';
+import subscribeRoute from './subscribe.route.js';
 
 route.use('/auth', authRoute);
 route.use('/user', userRoute);
@@ -15,5 +17,7 @@ route.use('/order', orderRoute);
 route.use('/payment', paymentRoute);
 route.use('/message', messageRoute);
 route.use('/invoice', invoiceGenerateRoute);
+route.use('/coupon', couponRoute);
+route.use('/subscription', subscribeRoute);
 
 export default route;

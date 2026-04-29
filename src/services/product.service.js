@@ -12,6 +12,10 @@ export const findProductById = (id, option) => {
   return productModel.findById(id, option);
 };
 
+export const findOneProduct = (filter, option) => {
+  return productModel.findOne(filter, option);
+};
+
 export const deleteById = (id) => {
   return productModel.findByIdAndDelete(id);
 };

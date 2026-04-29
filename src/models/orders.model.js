@@ -27,6 +27,10 @@ const orderSchema = mongoose.Schema(
       zipCode: { type: String, default: null },
       address: { type: String, default: null },
     },
+    discount: {
+      type: Number,
+      default: null,
+    },
     totalAmount: {
       type: Number,
       default: 0,

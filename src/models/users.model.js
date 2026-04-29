@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DB_NAME, PROVIDER, ROLE } from '../utils/constant.js';
+import { DB_NAME, PLAN, PLAN_STATUS, PROVIDER, ROLE } from '../utils/constant.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -61,6 +61,28 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(PROVIDER),
       required: true,
+    },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+    },
+    subscriptionId: {
+      type: String,
+      default: null,
+    },
+    plan: {
+      type: String,
+      enum: Object.values(PLAN),
+      default: PLAN.MONTHLY,
+    },
+    subscriptionStatus: {
+      type: String,
+      enum: Object.values(PLAN_STATUS),
+      default: PLAN_STATUS.INACTIVE,
+    },
+    currentPeriodEnd: {
+      type: Date,
+      default: null,
     },
     deletedAt: {
       type: Date,

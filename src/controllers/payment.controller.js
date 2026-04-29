@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { STATUS } from '../utils/constant.js';
 import { findOrderById, updateById } from '../services/order.service.js';
 import { create, updatePayment, findPayment, paymentList } from '../services/payment.service.js';
+import { findOneCoupon } from '../services/coupon.service.js';
 // import { findOne, updateUserById } from '../services/auth.service.js';
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -20,7 +21,7 @@ export const getPaymentList = async (req, res) => {
 
 export const createCheckoutPayment = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { orderId, promoCode } = req.body;
     const order = await findOrderById(orderId);
     const { userId } = req.user;
     //1. checking is existing order
@@ -45,17 +46,30 @@ export const createCheckoutPayment = async (req, res) => {
       },
       quantity: item.quantity,
     }));
+    let discounts = [];
 
+    if (promoCode) {
+      const coupon = await findOneCoupon({
+        code: promoCode,
+        active: true,
+      });
+
+      if (!coupon) return res.fail(400, 'Invalid coupon');
+
+      discounts.push({
+        promotion_code: coupon.stripePromotionCodeId,
+      });
+    }
     //3. create checout session for payment
     const checkout = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      success_url: `${process.env.BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      discounts,
+      success_url: `${process.env.BASE_URL}/public/success.html`,
       cancel_url: `${process.env.BASE_URL}/cancel`,
       metadata: { orderId: order._id.toString(), userId: userId.toString() },
     });
-
     //4. create payment
     await create({ userId, orderId, amount: order.totalAmount });
     return res.success(200, 'Payment created successfully.', {
@@ -103,13 +117,21 @@ export const webhook = async (req, res) => {
     let event = req.body;
     const session = event.data.object;
     const orderId = session.metadata.orderId;
+    const totalPaid = session.amount_total / 100;
+    const discount = session.total_details?.amount_discount
+      ? session.total_details.amount_discount / 100
+      : 0;
     if (event.type == 'checkout.session.completed') {
       // if (event.type === "payment_intent.succeeded") {
 
       await updateById(orderId, {
+        discount,
         orderStatus: STATUS.COMPLETED,
       });
-      await updatePayment({ orderId: orderId }, { paymentStatus: STATUS.COMPLETED });
+      await updatePayment(
+        { orderId: orderId },
+        { paymentStatus: STATUS.COMPLETED, amount: totalPaid }
+      );
       return res.success(200, 'Payment success.');
     }
     if (event.type == 'checkout.session.async_payment_failed') {
