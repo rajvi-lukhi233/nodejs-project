@@ -21,6 +21,14 @@ const paymentSchema = mongoose.Schema(
       enum: Object.values(STATUS),
       default: STATUS.PENDING,
     },
+    paymentIntentId: {
+      type: String,
+      default: null,
+    },
+    refundId: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true, versionKey: false }
 );

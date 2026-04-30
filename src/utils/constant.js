@@ -15,6 +15,8 @@ export const STATUS = {
   PENDING: 'pending',
   COMPLETED: 'completed',
   FAILED: 'failed',
+  REFUND_PENDING: 'refund_pending',
+  REFUNDED: 'refunded',
 };
 export const PROVIDER = {
   GOOGLE: 'google',

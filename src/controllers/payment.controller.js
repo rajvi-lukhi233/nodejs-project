@@ -81,6 +81,31 @@ export const createCheckoutPayment = async (req, res) => {
   }
 };
 
+export const refundsPayment = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const payment = await findPayment({ orderId, paymentStatus: STATUS.COMPLETED });
+    if (!payment) {
+      return res.fail(404, 'Payment not found');
+    }
+    if (!payment.paymentIntentId) {
+      return res.fail(400, 'PaymentIntent missing');
+    }
+    if (payment.paymentStatus === STATUS.REFUNDED) {
+      return res.fail(400, 'Already refunded');
+    }
+
+    const refund = await stripe.refunds.create({
+      payment_intent: payment.paymentIntentId,
+    });
+    await updatePayment({ orderId }, { paymentStatus: STATUS.REFUND_PENDING, refundId: refund.id });
+    return res.success(200, 'Refund created successfully', refund);
+  } catch (error) {
+    console.log('refundsPayment API Error:', error);
+    return res.fail(500, 'Internal server error.');
+  }
+};
+
 //-----------using payment-intenet-method--------------------//
 
 // export const createPaymentIntent = async (req, res) => {
@@ -130,9 +155,22 @@ export const webhook = async (req, res) => {
       });
       await updatePayment(
         { orderId: orderId },
-        { paymentStatus: STATUS.COMPLETED, amount: totalPaid }
+        {
+          paymentStatus: STATUS.COMPLETED,
+          amount: totalPaid,
+          paymentIntentId: session.payment_intent,
+        }
       );
       return res.success(200, 'Payment success.');
+    }
+    if (event.type == 'charge.refunded') {
+      const paymentIntentId = session.payment_intent;
+
+      await updatePayment(
+        { paymentIntentId },
+
+        { paymentStatus: STATUS.REFUNDED }
+      );
     }
     if (event.type == 'checkout.session.async_payment_failed') {
       // if (event.type === "payment_intent.payment_failed") {

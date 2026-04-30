@@ -20,6 +20,7 @@ export const createSubscribePlan = async (req, res) => {
     let customerId = user.stripeCustomerId;
     if (!customerId) {
       const customer = await stripe.customers.create({
+        name: user.name,
         email,
       });
       customerId = customer.id;
