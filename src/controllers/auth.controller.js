@@ -14,6 +14,7 @@ import crypto from 'crypto';
 import { get, redisDelete, set } from '../utils/redis.js';
 import { PROVIDER } from '../utils/constant.js';
 import { getChannel } from '../../config/rabbitmqConfig.js';
+import { sendEmail } from '../utils/resendMailSend.js';
 // import { emailQueue } from '../queues/emailQueue.js';
 
 export const register = async (req, res) => {
@@ -53,6 +54,8 @@ export const register = async (req, res) => {
       persistent: true,
     });
     // await emailQueue.add('sendVerificationEmail', { name, email, verifyToken });
+    await sendEmail(email, 'Welcome Email', `<h1>Hello ${name}, Welcome at our site</h1>`);
+
     if (user) {
       return res.success(
         201,
@@ -134,6 +137,15 @@ export const login = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  try {
+    return res.success(200, 'Logout successfully');
+  } catch (error) {
+    console.log('logout API Error:', error);
+    return res.fail(500, 'Internal server error');
+  }
+};
+
 export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -152,6 +164,8 @@ export const sendOtp = async (req, res) => {
     await set(`otp:${user.id}`, otp, 60);
     // const emailBody = getOtpEmailTemplate(user.name, otp);
     // sendMail(email, "Forgot password OPT", emailBody);
+    await sendEmail(email, 'Forgot password OPT', emailBody);//using Resend
+
     return res.success(200, 'OTP has been sent to your email address successfully.', {
       otp,
     });
@@ -346,5 +360,19 @@ export const loginWithGoogle = async (req, res) => {
   } catch (error) {
     console.log('LoginWithGoogle API Error:', error);
     return res.fail(500, 'Internal server error');
+  }
+};
+
+export const mailWebhook = async (req, res) => {
+  try {
+    const event = req.body;
+    if (event.type == 'email.delivered') {
+      console.log('Email delivered successfully');
+    }
+    if (event.type == 'email.bounced') {
+      console.log('Email bounced');
+    }
+  } catch (error) {
+    console.log('Error at mail webhook', error);
   }
 };

@@ -12,6 +12,7 @@ import {
   twoFactorLogin,
   loginWithGoogle,
   loginWithGoogleLink,
+  logout,
 } from '../controllers/auth.controller.js';
 import { validation } from '../middleware/validationMiddleware.js';
 import {
@@ -38,5 +39,6 @@ route
   .post('/2faLogin', twoFactorLogin)
   .get('/', loginWithGoogleLink)
   .get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }))
-  .get('/google/callback', passport.authenticate('google', { session: false }), loginWithGoogle);
+  .get('/google/callback', passport.authenticate('google', { session: false }), loginWithGoogle)
+  .post('/logout', auth, logout);
 export default route;
