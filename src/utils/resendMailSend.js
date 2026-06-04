@@ -7,11 +7,6 @@ export const sendEmail = async (email, subject, body) => {
     to: email,
     subject: subject,
     html: body,
-    attachments: [
-      {
-        contentId,
-      },
-    ],
   });
   if (error) {
     console.log('Failed to sending email', error);
