@@ -14,13 +14,13 @@ import http from 'http';
 import { initSocket } from './utils/socket.js';
 import mongoose from 'mongoose';
 import { connectRabbitMQ } from '../config/rabbitmqConfig.js';
+import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(perfLogx());
-
 app.use(passport.initialize());
 
 const port = process.env.PORT;
@@ -72,6 +72,7 @@ const limiter = rateLimit({
 });
 initSocket(io);
 app.use(express.json());
+app.use(cors());
 app.use(createResponseHandler());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(limiter);
@@ -95,3 +96,6 @@ async function gracefulShutdown() {
 
 // Listen for termination signals
 process.on('SIGINT', gracefulShutdown); // Ctrl + C
+
+//SIGTERM =  Server stop / Docker stop
+// SIGQUIT = Quit process
